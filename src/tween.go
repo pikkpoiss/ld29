@@ -25,18 +25,18 @@ func (t *tween) Done() bool {
 
 type LinearTween struct {
 	tween
-	start, end float32
+	Start, End float32
 }
 
 func (t *LinearTween) Current() float32 {
 	var pct = float32(t.elapsed) / float32(t.duration)
-	return pct*(t.end-t.start) + t.start
+	return pct*(t.End-t.Start) + t.Start
 }
 
-func NewLinearTween(start, end float32, duration time.Duration) Tween {
+func NewLinearTween(start, end float32, duration time.Duration) *LinearTween {
 	return &LinearTween{
-		start: start,
-		end:   end,
+		Start: start,
+		End:   end,
 		tween: tween{duration: duration, elapsed: 0},
 	}
 }

@@ -14,9 +14,9 @@ type GameLayer struct {
 	App           *Application
 	playerLayer   int
 	topLayer      int
-	topTrans      Tween
+	topTrans      *LinearTween
 	botLayer      int
-	botTrans      Tween
+	botTrans      *LinearTween
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
@@ -105,6 +105,9 @@ func (l *GameLayer) Update(elapsed time.Duration) {
 	}
 }
 
+const TopSlideSpeed = time.Duration(500) * time.Millisecond
+const BotSlideSpeed = time.Duration(200) * time.Millisecond
+
 func (l *GameLayer) LayerAdvance() {
 	if l.playerLayer >= l.Level.Layers-1 || l.Level == nil {
 		return
@@ -112,8 +115,8 @@ func (l *GameLayer) LayerAdvance() {
 	l.topLayer = l.playerLayer
 	l.botLayer = l.topLayer + 1
 	l.playerLayer = l.botLayer
-	l.topTrans = NewLinearTween(0, l.Bounds.Max.Y, time.Duration(500)*time.Millisecond)
-	l.botTrans = NewLinearTween(-1, 0, time.Duration(200)*time.Millisecond)
+	l.topTrans = NewLinearTween(0, l.Bounds.Max.Y, TopSlideSpeed)
+	l.botTrans = NewLinearTween(-1, 0, BotSlideSpeed)
 }
 
 func (l *GameLayer) LayerRewind() {
@@ -123,8 +126,8 @@ func (l *GameLayer) LayerRewind() {
 	l.topLayer = l.playerLayer - 1
 	l.botLayer = l.topLayer + 1
 	l.playerLayer = l.topLayer
-	l.topTrans = NewLinearTween(l.Bounds.Max.Y, 0, time.Duration(500)*time.Millisecond)
-	l.botTrans = NewLinearTween(0, -1, time.Duration(200)*time.Millisecond)
+	l.topTrans = NewLinearTween(l.Bounds.Max.Y, 0, TopSlideSpeed)
+	l.botTrans = NewLinearTween(0, -1, BotSlideSpeed)
 }
 
 func (l *GameLayer) Reset() (err error) {
