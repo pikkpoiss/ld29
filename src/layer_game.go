@@ -10,6 +10,7 @@ import (
 type GameLayer struct {
 	Level         *Level
 	BatchRenderer *twodee.BatchRenderer
+	TileRenderer  *twodee.TileRenderer
 	Bounds        twodee.Rectangle
 	App           *Application
 	playerLayer   int
@@ -27,6 +28,15 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 		botLayer: 1,
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
+		return
+	}
+	tilem := twodee.TileMetadata{
+		Path:       "assets/level00/tiles.fw.png",
+		PxPerUnit:  32,
+		TileWidth:  32,
+		TileHeight: 32,
+	}
+	if layer.TileRenderer, err = twodee.NewTileRenderer(layer.Bounds, app.WinBounds, tilem); err != nil {
 		return
 	}
 	layer.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
@@ -80,8 +90,16 @@ func (l *GameLayer) Render() {
 				y = -1.0
 			}
 		}
-		if i == l.topLayer || i == l.botLayer || i == l.playerLayer {
+		if i == l.topLayer || i == l.botLayer {
 			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
+		}
+		if i == l.playerLayer {
+			l.BatchRenderer.Unbind()
+			l.TileRenderer.Bind()
+			pt := l.Level.Player.Pos()
+			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y, 0, false, false)
+			l.TileRenderer.Unbind()
+			l.BatchRenderer.Bind()
 		}
 	}
 	l.BatchRenderer.Unbind()
