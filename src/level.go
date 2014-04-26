@@ -10,49 +10,40 @@ import (
 )
 
 type Level struct {
+	Height              float32
 	Grids               []*twodee.Grid
 	Geometry            []*twodee.Batch
 	GridRatios          []float32
-	Layers              int
+	Layers              int32
 	Player              *Player
 	Active              int32
+	Transitions         []*LinearTween
 	eventSystem         *twodee.GameEventHandler
 	onPlayerMoveEventId int
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var (
-		player  *Player
-		grid    *twodee.Grid
-		batch   *twodee.Batch
-		grids   = []*twodee.Grid{}
-		batches = []*twodee.Batch{}
-		ratio   float32
-		ratios  = []float32{}
-	)
-	for _, name := range names {
-		if grid, batch, ratio, err = loadLayer(path, name); err != nil {
-			return
-		}
-		grids = append(grids, grid)
-		batches = append(batches, batch)
-		ratios = append(ratios, ratio)
-	}
-	player = NewPlayer(twodee.NewBaseEntity(1, 1, 1, 1, 0, 0))
+	var player = NewPlayer(twodee.NewBaseEntity(1, 1, 1, 1, 0, 0))
 	l = &Level{
-		Grids:       grids,
-		Geometry:    batches,
-		Layers:      len(grids),
-		GridRatios:  ratios,
+		Height:      0,
+		Grids:       []*twodee.Grid{},
+		Geometry:    []*twodee.Batch{},
+		GridRatios:  []float32{},
+		Layers:      0,
 		Active:      0,
 		Player:      player,
 		eventSystem: eventSystem,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
+	for _, name := range names {
+		if err = l.loadLayer(path, name); err != nil {
+			return
+		}
+	}
 	return
 }
 
-func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, ratio float32, err error) {
+func (l *Level) loadLayer(path, name string) (err error) {
 	var (
 		tilemeta twodee.TileMetadata
 		maptiles []*tmxgo.Tile
@@ -61,6 +52,10 @@ func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, ratio
 		m        *tmxgo.Map
 		i        int
 		data     []byte
+		height   float32
+		grid     *twodee.Grid
+		batch    *twodee.Batch
+		ratio    float32
 	)
 	path = filepath.Join(filepath.Dir(path), name)
 	if data, err = ioutil.ReadFile(path); err != nil {
@@ -98,6 +93,15 @@ func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, ratio
 		return
 	}
 	ratio = float32(grid.Width) * float32(tilemeta.PxPerUnit) / float32(m.TileWidth*m.Width)
+	height = float32(grid.Height) / ratio
+	if l.Height < height {
+		l.Height = height
+	}
+	l.Grids = append(l.Grids, grid)
+	l.Geometry = append(l.Geometry, batch)
+	l.Layers += 1
+	l.Transitions = append(l.Transitions, nil)
+	l.GridRatios = append(l.GridRatios, ratio)
 	return
 }
 
@@ -115,7 +119,8 @@ func getTexturePath(m *tmxgo.Map, path string) (out string, err error) {
 }
 
 func (l *Level) Delete() {
-	for i := 0; i < l.Layers; i++ {
+	var i int32
+	for i = 0; i < l.Layers; i++ {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
@@ -163,7 +168,56 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 	return false
 }
 
+func (l *Level) GetLayerY(index int32) float32 {
+	var tween = l.Transitions[index]
+	if tween != nil {
+		return tween.Current()
+	}
+	switch {
+	case index > l.Active:
+		return -1
+	case index < l.Active:
+		return l.Height
+	case index == l.Active:
+		return 0
+	}
+	return 0
+}
+
+const TopSlideSpeed = time.Duration(320) * time.Millisecond
+const BotSlideSpeed = time.Duration(320) * time.Millisecond
+
+func (l *Level) LayerAdvance() {
+	if l.Active >= l.Layers-1 {
+		return
+	}
+	l.Transitions[l.Active] = NewLinearTween(0, l.Height, TopSlideSpeed)
+	l.Active++
+	l.Transitions[l.Active] = NewLinearTween(-1, 0, BotSlideSpeed)
+}
+
+func (l *Level) LayerRewind() {
+	if l.Active <= 0 {
+		return
+	}
+	l.Transitions[l.Active-1] = NewLinearTween(l.Height, 0, TopSlideSpeed)
+	l.Transitions[l.Active-1].SetCallback(func() {
+		l.Active--
+	})
+	l.Transitions[l.Active] = NewLinearTween(0, -1, BotSlideSpeed)
+}
+
 func (l *Level) Update(elapsed time.Duration) {
+	var i int32
+	for i = 0; i < l.Layers; i++ {
+		if l.Transitions[i] != nil {
+			if l.Transitions[i].Done() {
+				l.Transitions[i] = nil
+			} else {
+				l.Transitions[i].Update(elapsed)
+			}
+		}
+	}
 	l.Player.Update(elapsed)
 	l.Player.AttemptMove(l)
 }
