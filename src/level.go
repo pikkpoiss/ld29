@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/kurrik/tmxgo"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 )
 
@@ -39,7 +40,7 @@ func LoadLevel(path string) (l *Level, err error) {
 		grid = twodee.NewGrid(m.Width, m.Height)
 		for j, tile = range tiles {
 			if tile != nil {
-				grid.SetIndex(int32(i), true)
+				grid.SetIndex(int32(j), true)
 			}
 		}
 		grids = append(grids, grid)
@@ -50,12 +51,13 @@ func LoadLevel(path string) (l *Level, err error) {
 	return
 }
 
-func GetTexturePath(m *tmxgo.Map) (path string, err error) {
+func GetTexturePath(m *tmxgo.Map, path string) (out string, err error) {
+	var prefix = filepath.Dir(path)
 	for i := 0; i < len(m.Tilesets); i++ {
 		if m.Tilesets[i].Image == nil {
 			continue
 		}
-		path = m.Tilesets[i].Image.Source
+		out = filepath.Join(prefix, m.Tilesets[i].Image.Source)
 		return
 	}
 	err = fmt.Errorf("Could not find suitable tileset")
