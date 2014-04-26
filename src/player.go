@@ -14,7 +14,7 @@ type Player struct {
 func (p *Player) MoveToObserver(e twodee.GETyper) {}
 
 func (p *Player) Delete() {
-	eventSystem.RemoveObserver(PlayerMove, moveToObserverId)
+	p.eventSystem.RemoveObserver(PlayerMove, p.moveToObserverId)
 }
 
 func NewPlayer(e *twodee.BaseEntity, eventSystem *twodee.GameEventHandler) (player *Player) {
