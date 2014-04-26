@@ -53,3 +53,16 @@ Theme: "Beneath the surface"
     * Further down, better loot.
     * Levels fill with water slowly, eventually you
       hold your breath, take damage, etc.
+
+## Setup
+
+Complete the setup steps for the twodee lib.
+
+Also:
+
+	go get -u github.com/kurrik/tmxgo
+
+Run:
+
+	git submodule init
+	git submodule update
