@@ -28,7 +28,7 @@ func (a *AudioSystem) Delete() {
 	// Handlers and Music/Sound Effect objects respectively
 }
 
-func NewAudioSystem(app *Application) (ausioSystem *AudioSystem, err error) {
+func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	// TODO: Set up vars for mMsic and sound effect assests
 	// Create new Music and Sound Effect objects
 
@@ -38,4 +38,5 @@ func NewAudioSystem(app *Application) (ausioSystem *AudioSystem, err error) {
 
 	// TODO: Set up observers for each music and sound effect related
 	// function
+	return
 }

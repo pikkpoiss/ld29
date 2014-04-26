@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"runtime"
 	"time"
 
@@ -15,24 +14,19 @@ func init() {
 }
 
 type Application struct {
-	layers           *twodee.Layers
-	counter          *twodee.Counter
-	font             *twodee.FontFace
-	Context          *twodee.Context
-	State            *State
-	GameEventHandler *twodee.GameEventHandler
-	AudioSystem      *AudioSystem
+	layers      *twodee.Layers
+	counter     *twodee.Counter
+	Context     *twodee.Context
+	AudioSystem *AudioSystem
 }
 
 func NewApplication() (app *Application, err error) {
 	var (
-		layers           *twodee.Layers
-		context          *twodee.Context
-		winbounds        = twodee.Rect(0, 0, 600, 600)
-		counter          = twodee.NewCounter()
-		state            = NewState()
-		gameEventHandler = twodee.NewGameEventHandler(NumGameEventTypes)
-		audioSystem      *AudioSystem
+		layers      *twodee.Layers
+		context     *twodee.Context
+		winbounds   = twodee.Rect(0, 0, 600, 600)
+		counter     = twodee.NewCounter()
+		audioSystem *AudioSystem
 	)
 	if context, err = twodee.NewContext(); err != nil {
 		return
@@ -44,11 +38,9 @@ func NewApplication() (app *Application, err error) {
 	}
 	layers = twodee.NewLayers()
 	app = &Application{
-		layers:           layers,
-		counter:          counter,
-		Context:          context,
-		State:            state,
-		GameEventHandler: gameEventHandler,
+		layers:  layers,
+		counter: counter,
+		Context: context,
 	}
 	if audioSystem, err = NewAudioSystem(app); err != nil {
 		return
@@ -105,7 +97,7 @@ func main() {
 		updated_to   = current_time
 		step         = twodee.Step60Hz
 	)
-	for !app.Context.Window.ShouldClose() && !app.State.Exit {
+	for !app.Context.Window.ShouldClose() {
 		for !updated_to.After(current_time) {
 			app.Update(step)
 			updated_to = updated_to.Add(step)
@@ -113,7 +105,6 @@ func main() {
 		app.Draw()
 		app.Context.Window.SwapBuffers()
 		app.Context.Events.Poll()
-		app.GameEventHandler.Poll()
 		app.ProcessEvents()
 		current_time = time.Now()
 	}
