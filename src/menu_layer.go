@@ -133,7 +133,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			if event.Type != twodee.Press {
 				break
 			}
-			if event.Code == twodee.KeyN {
+			if event.Code == twodee.KeyEscape {
 				l.menu.Reset()
 				l.visible = true
 			}
@@ -181,7 +181,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			break
 		}
 		switch event.Code {
-		case twodee.KeyN:
+		case twodee.KeyEscape:
 			l.visible = false
 			return false
 		case twodee.KeyUp:

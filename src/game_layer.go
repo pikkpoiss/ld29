@@ -81,7 +81,7 @@ func (l *GameLayer) Render() {
 			l.BatchRenderer.Unbind()
 			l.TileRenderer.Bind()
 			pt := l.Level.Player.Pos()
-			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y + y, 0, false, false)
+			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, false, false)
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}
@@ -104,8 +104,6 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	case *twodee.KeyEvent:
 		released = event.Type == twodee.Release
 		switch event.Code {
-		case twodee.KeyEscape:
-			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
 		case twodee.KeyUp:
 			if released {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
