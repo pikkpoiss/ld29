@@ -118,10 +118,14 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		switch event.Code {
 		case twodee.KeyEscape:
 			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
-		case twodee.KeyLeft:
-		case twodee.KeyRight:
 		case twodee.KeyUp:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
+		case twodee.KeyRight:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
 		case twodee.KeyDown:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
+		case twodee.KeyLeft:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
 		}
 	}
 	return true
