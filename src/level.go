@@ -3,6 +3,7 @@ package main
 import (
 	twodee "../libs/twodee"
 	"github.com/kurrik/tmxgo"
+	"io/ioutil"
 	"strings"
 )
 
@@ -14,8 +15,8 @@ func LoadLevel(path string) (l *Level, err error) {
 	var (
 		data  []byte
 		m     *tmxgo.Map
-		layer *tmxgo.Layer
-		i, j  int32
+		layer tmxgo.Layer
+		i, j  int
 		grids = []*twodee.Grid{}
 		grid  *twodee.Grid
 		tiles []*tmxgo.Tile
@@ -31,13 +32,13 @@ func LoadLevel(path string) (l *Level, err error) {
 		if !strings.HasPrefix(layer.Name, "layer") {
 			continue
 		}
-		if tiles, err = m.TilesFromLayerIndex(i); err != nil {
+		if tiles, err = m.TilesFromLayerIndex(int32(i)); err != nil {
 			return
 		}
 		grid = twodee.NewGrid(m.Width, m.Height)
-		for i, t = range tiles {
-			if t != nil {
-				grid.SetIndex(i, true)
+		for i, tile = range tiles {
+			if tile != nil {
+				grid.SetIndex(int32(i), true)
 			}
 		}
 		grids = append(grids, grid)
