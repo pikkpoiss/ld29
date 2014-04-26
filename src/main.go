@@ -28,9 +28,6 @@ func NewApplication() (app *Application, err error) {
 	var (
 		layers           *twodee.Layers
 		context          *twodee.Context
-		gamelayer        *GameLayer
-		debuglayer       *DebugLayer
-		menulayer        *MenuLayer
 		winbounds        = twodee.Rect(0, 0, 600, 600)
 		counter          = twodee.NewCounter()
 		state            = NewState()
@@ -42,7 +39,7 @@ func NewApplication() (app *Application, err error) {
 	}
 	context.SetFullscreen(false)
 	context.SetCursor(false)
-	if err = context.CreateWindow(int(winbounds.Max.X), int(winbounds.Max.Y), "twodee test"); err != nil {
+	if err = context.CreateWindow(int(winbounds.Max.X), int(winbounds.Max.Y), "LD29"); err != nil {
 		return
 	}
 	layers = twodee.NewLayers()
@@ -53,20 +50,6 @@ func NewApplication() (app *Application, err error) {
 		State:            state,
 		GameEventHandler: gameEventHandler,
 	}
-	if gamelayer, err = NewGameLayer(winbounds, state, app); err != nil {
-		return
-	}
-	if debuglayer, err = NewDebugLayer(winbounds, counter); err != nil {
-		return
-	}
-	layers.Push(gamelayer)
-	layers.Push(debuglayer)
-	fmt.Printf("OpenGL version: %s\n", context.OpenGLVersion)
-	fmt.Printf("Shader version: %s\n", context.ShaderVersion)
-	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
-		return
-	}
-	layers.Push(menulayer)
 	if audioSystem, err = NewAudioSystem(app); err != nil {
 		return
 	}
