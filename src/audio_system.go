@@ -3,15 +3,13 @@ package main
 import twodee "../libs/twodee"
 
 type AudioSystem struct {
-	app *Application
-
-	// TODO: Add in *twodee.Music and *twodee.SoundEffect pointers here
-	// for adutio elements being used
+	app                    *Application
 	exploreMusic           *twodee.Music
 	exploreMusicObserverId int
+	pauseMusicObserverId   int
+	resumeMusicObserverId  int
 }
 
-// TODO: Add in functions to play music files and sound effect files
 func (a *AudioSystem) PlayExploreMusic(e twodee.GETyper) {
 	if twodee.MusicIsPlaying() {
 		twodee.PauseMusic()
@@ -32,14 +30,13 @@ func (a *AudioSystem) ResumeMusic(e twodee.GETyper) {
 }
 
 func (a *AudioSystem) Delete() {
-	// TODO: Call RemoveObserver and Delete functions on Game Event
-	// Handlers and Music/Sound Effect objects respectively
+	a.app.GameEventHandler.RemoveObserver(PlayExploreMusic, a.exploreMusicObserverId)
+	a.app.GameEventHandler.RemoveObserver(PauseMusic, a.pauseMusicObserverId)
+	a.app.GameEventHandler.RemoveObserver(ResumeMusic, a.resumeMusicObserverId)
 	a.exploreMusic.Delete()
 }
 
 func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
-	// TODO: Set up vars for mMsic and sound effect assests
-	// Create new Music and Sound Effect objects
 	var (
 		exploreMusic *twodee.Music
 	)
@@ -50,8 +47,8 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		app:          app,
 		exploreMusic: exploreMusic,
 	}
-	// TODO: Set up observers for each music and sound effect related
-	// function
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayExploreMusic, audioSystem.PlayExploreMusic)
+	audioSystem.pauseMusicObserverId = app.GameEventHandler.AddObserver(PauseMusic, audioSystem.PauseMusic)
+	audioSystem.resumeMusicObserverId = app.GameEventHandler.AddObserver(ResumeMusic, audioSystem.ResumeMusic)
 	return
 }
