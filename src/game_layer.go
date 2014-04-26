@@ -31,7 +31,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 		return
 	}
 	tilem := twodee.TileMetadata{
-		Path:       "assets/level00/tiles.fw.png",
+		Path:       "assets/entities.fw.png",
 		PxPerUnit:  32,
 		TileWidth:  32,
 		TileHeight: 32,
@@ -186,9 +186,13 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
 			}
 		case twodee.KeyJ:
-			l.LayerRewind()
+			if released {
+				l.LayerRewind()
+			}
 		case twodee.KeyK:
-			l.LayerAdvance()
+			if released {
+				l.LayerAdvance()
+			}
 		case twodee.KeyM:
 			if twodee.MusicIsPaused() {
 				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
