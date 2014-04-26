@@ -14,20 +14,25 @@ func init() {
 }
 
 type Application struct {
-	layers      *twodee.Layers
-	counter     *twodee.Counter
-	Context     *twodee.Context
-	AudioSystem *AudioSystem
-	WinBounds   twodee.Rectangle
+	layers                *twodee.Layers
+	counter               *twodee.Counter
+	Context               *twodee.Context
+	AudioSystem           *AudioSystem
+	WinBounds             twodee.Rectangle
+	GameEventHandler      *twodee.GameEventHandler
+	gameClosingObserverId int
+	InitiateCloseGame     bool
 }
 
 func NewApplication() (app *Application, err error) {
 	var (
-		layers    *twodee.Layers
-		context   *twodee.Context
-		winbounds = twodee.Rect(0, 0, 600, 600)
-		counter   = twodee.NewCounter()
-		gameLayer *GameLayer
+		layers            *twodee.Layers
+		context           *twodee.Context
+		winbounds         = twodee.Rect(0, 0, 600, 600)
+		counter           = twodee.NewCounter()
+		gameLayer         *GameLayer
+		gameEventHandler  = twodee.NewGameEventHandler(NumGameEventTypes)
+		initiateCloseGame = false
 	)
 	if context, err = twodee.NewContext(); err != nil {
 		return
@@ -39,10 +44,12 @@ func NewApplication() (app *Application, err error) {
 	}
 	layers = twodee.NewLayers()
 	app = &Application{
-		layers:    layers,
-		counter:   counter,
-		Context:   context,
-		WinBounds: winbounds,
+		layers:            layers,
+		counter:           counter,
+		Context:           context,
+		WinBounds:         winbounds,
+		GameEventHandler:  gameEventHandler,
+		InitiateCloseGame: initiateCloseGame,
 	}
 	if app.AudioSystem, err = NewAudioSystem(app); err != nil {
 		return
@@ -54,6 +61,7 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(gameLayer)
+	app.gameClosingObserverId = app.GameEventHandler.AddObserver(GameIsClosing, app.CloseGame)
 	return
 }
 
@@ -68,6 +76,7 @@ func (a *Application) Update(elapsed time.Duration) {
 }
 
 func (a *Application) Delete() {
+	a.GameEventHandler.RemoveObserver(GameIsClosing, gameClosingObserverId)
 	a.layers.Delete()
 	a.AudioSystem.Delete()
 	a.Context.Delete()
@@ -89,6 +98,10 @@ func (a *Application) ProcessEvents() {
 	}
 }
 
+func (a *Application) CloseGame() {
+	InitiateCloseGame = true
+}
+
 func main() {
 	var (
 		app *Application
@@ -105,7 +118,7 @@ func main() {
 		updated_to   = current_time
 		step         = twodee.Step60Hz
 	)
-	for !app.Context.Window.ShouldClose() {
+	for !app.Context.Window.ShouldClose() && !app.InitiateCloseGame {
 		for !updated_to.After(current_time) {
 			app.Update(step)
 			updated_to = updated_to.Add(step)

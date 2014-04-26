@@ -9,6 +9,7 @@ const (
 	DownLayer
 	UpWaterLevel
 	DownWaterLevel
+	GameIsClosing
 	sentinel
 )
 
