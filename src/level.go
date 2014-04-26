@@ -12,7 +12,7 @@ import (
 type Level struct {
 	Grids    []*twodee.Grid
 	Geometry []*twodee.Batch
-	Layers int
+	Layers   int
 }
 
 func LoadLevel(path string) (l *Level, err error) {
@@ -43,7 +43,8 @@ func LoadLevel(path string) (l *Level, err error) {
 		Path:      path,
 		PxPerUnit: 32,
 	}
-	for i, layer = range m.Layers {
+	for i = len(m.Layers) - 1; i >= 0; i-- {
+		layer = m.Layers[i]
 		if !strings.HasPrefix(layer.Name, "layer") {
 			continue
 		}
@@ -71,7 +72,7 @@ func LoadLevel(path string) (l *Level, err error) {
 	l = &Level{
 		Grids:    grids,
 		Geometry: batches,
-		Layers: len(grids),
+		Layers:   len(grids),
 	}
 	return
 }

@@ -19,8 +19,10 @@ type GameLayer struct {
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	layer = &GameLayer{
-		App:    app,
-		Bounds: twodee.Rect(0, 0, 10, 10),
+		App:      app,
+		Bounds:   twodee.Rect(0, 0, 10, 10),
+		topLayer: 0,
+		botLayer: 1,
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
@@ -30,7 +32,6 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 
 func (l *GameLayer) LoadLevel(path string) (err error) {
 	l.Level, err = LoadLevel(path)
-	l.LayerAdvance()
 	return
 }
 
@@ -42,24 +43,26 @@ func (l *GameLayer) Delete() {
 
 func (l *GameLayer) Render() {
 	var (
-		y           float32 = 0.0
-		drawnPlayer bool    = false
+		y float32
 	)
 	l.BatchRenderer.Bind()
 	for i := l.Level.Layers - 1; i >= 0; i-- {
-		if i == l.botLayer && l.botTrans != nil {
-			y = l.botTrans.Current()
-			l.BatchRenderer.Draw(l.Level.Geometry[l.botLayer], 0, y, 0)
-			if i == l.playerLayer {
-				drawnPlayer = true
+		y = 0.0
+		if i == l.topLayer {
+			if l.topTrans != nil {
+				y = l.topTrans.Current()
+			} else if l.topLayer != l.playerLayer {
+				y = l.Bounds.Max.Y
+			}
+		} else if i == l.botLayer {
+			if l.botTrans != nil {
+				y = l.botTrans.Current()
+			} else if l.botLayer != l.playerLayer {
+				y = -1.0
 			}
 		}
-		if i == l.playerLayer && drawnPlayer == false {
-			l.BatchRenderer.Draw(l.Level.Geometry[l.playerLayer], 0, 0, 0)
-		}
-		if i == l.topLayer && l.topTrans != nil {
-			y = l.topTrans.Current()
-			l.BatchRenderer.Draw(l.Level.Geometry[l.topLayer], 0, y, 0)
+		if i == l.topLayer || i == l.botLayer || i == l.playerLayer {
+			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
 		}
 	}
 	l.BatchRenderer.Unbind()
@@ -84,7 +87,7 @@ func (l *GameLayer) Update(elapsed time.Duration) {
 }
 
 func (l *GameLayer) LayerAdvance() {
-	if l.playerLayer >= l.Level.Layers {
+	if l.playerLayer >= l.Level.Layers-1 || l.Level == nil {
 		return
 	}
 	l.topLayer = l.playerLayer
@@ -95,14 +98,14 @@ func (l *GameLayer) LayerAdvance() {
 }
 
 func (l *GameLayer) LayerRewind() {
-	if l.playerLayer <= 0 {
+	if l.playerLayer <= 0 || l.Level == nil {
 		return
 	}
 	l.topLayer = l.playerLayer - 1
 	l.botLayer = l.topLayer + 1
 	l.playerLayer = l.topLayer
 	l.topTrans = NewLinearTween(l.Bounds.Max.Y, 0, time.Duration(500)*time.Millisecond)
-	l.botTrans = NewLinearTween(0, -l.Bounds.Max.Y, time.Duration(200)*time.Millisecond)
+	l.botTrans = NewLinearTween(0, -1, time.Duration(200)*time.Millisecond)
 }
 
 func (l *GameLayer) Reset() (err error) {
@@ -119,10 +122,12 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		case twodee.KeyEscape:
 			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
 		case twodee.KeyUp:
+			l.LayerRewind()
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
 		case twodee.KeyRight:
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
 		case twodee.KeyDown:
+			l.LayerAdvance()
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
 		case twodee.KeyLeft:
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))

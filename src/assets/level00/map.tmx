@@ -3,14 +3,34 @@
  <tileset firstgid="1" name="tiles.fw" tilewidth="16" tileheight="16">
   <image source="tiles.fw.png" width="256" height="256"/>
  </tileset>
+ <layer name="layer5" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjY2BgYBvFo3gUj+JRPOyxAJUxAIeDCik=
+  </data>
+ </layer>
+ <layer name="layer4" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZWBgYB3Fo3gUj+JRPOyxAJUxAKVgCK0=
+  </data>
+ </layer>
+ <layer name="layer3" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYWBgYBnFo3gUj+JRPOyxAJUxAMM9BzE=
+  </data>
+ </layer>
  <layer name="layer2" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYKA+EKASRjaPGm4aNW/UvFHzRs0biuZRszylJgAAV4MEQQ==
+   eJxjZmBgYB7Fo3gUj+JRPOyxAJUxAOEaBbU=
   </data>
  </layer>
  <layer name="layer1" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjZGBgYKQiZmKgHmAeNW/UvFHzRs0bNY9q5rFQGQMApL8Avw==
+   eJxjYmBgYBrFo3gUj+JRPOyxAJUxAP73BDk=
+  </data>
+ </layer>
+ <layer name="layer0" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYBzFo3gUj+JRPOyxAJUxABzjAr0=
   </data>
  </layer>
 </map>
