@@ -136,12 +136,6 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 			if released {
 				l.Level.LayerAdvance()
 			}
-		case twodee.KeyM:
-			if twodee.MusicIsPaused() {
-				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
-			} else {
-				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
-			}
 		}
 	}
 	return true
