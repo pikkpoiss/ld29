@@ -10,15 +10,20 @@ type Player struct {
 	Speed       float32
 	Velocity    twodee.Point
 	DesiredMove MoveDirection
+	Inventory   []*Item
 }
 
 func NewPlayer(e *twodee.BaseEntity) (player *Player) {
+	var (
+		inv = make([]*Item, 0, 10)
+	)
 	player = &Player{
 		BaseEntity:  e,
 		Health:      100.0,
 		Speed:       0.2,
 		Velocity:    twodee.Pt(0, 0),
 		DesiredMove: None,
+		Inventory:   inv,
 	}
 	return
 }
@@ -60,4 +65,8 @@ func (p *Player) AttemptMove(l *Level) {
 	} else {
 		p.MoveTo(pos)
 	}
+}
+
+func (p *Player) AddToInventory(item *Item) {
+	p.Inventory = append(p.Inventory, item)
 }
