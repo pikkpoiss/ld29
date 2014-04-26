@@ -7,6 +7,8 @@ import (
 const (
 	UpLayer twodee.GameEventType = iota
 	DownLayer
+	UpWaterLevel
+	DownWaterLevel
 	sentinel
 )
 
