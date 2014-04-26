@@ -3,11 +3,11 @@ package main
 type ItemType int
 
 const (
-	item1 ItemType = iota
-	item2
-	item3
-	item4
-	item5
+	Item1 ItemType = iota
+	Item2
+	Item3
+	Item4
+	Item5
 	item_sentinel
 )
 
@@ -16,6 +16,18 @@ const (
 )
 
 type Item struct {
-	Id   int
+	Id   ItemType
 	Name string
+}
+
+func NewItem(itemType ItemType, name string) (item *Item) {
+	item = &Item{
+		Id:   itemType,
+		Name: name,
+	}
+	return
+}
+
+func (i *Item) getType() (itemType ItemType) {
+	return i.Id
 }

@@ -69,4 +69,16 @@ func (p *Player) AttemptMove(l *Level) {
 
 func (p *Player) AddToInventory(item *Item) {
 	p.Inventory = append(p.Inventory, item)
+	switch item.getType() {
+	case Item1:
+		p.Health = p.Health + 10
+	case Item2:
+		p.Health = p.Health + 20
+	case Item3:
+		p.Health = p.Health + 30
+	case Item4:
+		p.Speed = p.Speed + 10
+	case Item5:
+		p.Speed = p.Speed + 20
+	}
 }
