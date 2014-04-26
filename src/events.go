@@ -11,6 +11,9 @@ const (
 	DownWaterLevel
 	PlayerMove
 	GameIsClosing
+	PlayExploreMusic
+	PauseMusic
+	ResumeMusic
 	sentinel
 )
 

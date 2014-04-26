@@ -38,6 +38,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	if layer.TileRenderer, err = twodee.NewTileRenderer(layer.Bounds, app.WinBounds, tilem); err != nil {
 		return
 	}
+	layer.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
 	return
 }
 
@@ -150,6 +151,12 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
 		case twodee.KeyLeft:
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
+		case twodee.KeyM:
+			if twodee.MusicIsPaused() {
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
+			} else {
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+			}
 		}
 	}
 	return true
