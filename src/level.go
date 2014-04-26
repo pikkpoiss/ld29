@@ -12,6 +12,7 @@ import (
 type Level struct {
 	Grids    []*twodee.Grid
 	Geometry []*twodee.Batch
+	Layers int
 }
 
 func LoadLevel(path string) (l *Level, err error) {
@@ -68,6 +69,7 @@ func LoadLevel(path string) (l *Level, err error) {
 	l = &Level{
 		Grids:    grids,
 		Geometry: batches,
+		Layers: len(grids),
 	}
 	return
 }
@@ -83,4 +85,10 @@ func GetTexturePath(m *tmxgo.Map, path string) (out string, err error) {
 	}
 	err = fmt.Errorf("Could not find suitable tileset")
 	return
+}
+
+func (l *Level) Delete() {
+	for i := 0; i < l.Layers; i++ {
+		l.Geometry[i].Delete()
+	}
 }

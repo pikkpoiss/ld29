@@ -18,6 +18,7 @@ type Application struct {
 	counter     *twodee.Counter
 	Context     *twodee.Context
 	AudioSystem *AudioSystem
+	WinBounds twodee.Rectangle
 }
 
 func NewApplication() (app *Application, err error) {
@@ -41,6 +42,7 @@ func NewApplication() (app *Application, err error) {
 		layers:  layers,
 		counter: counter,
 		Context: context,
+		WinBounds: winbounds,
 	}
 	if audioSystem, err = NewAudioSystem(app); err != nil {
 		return
