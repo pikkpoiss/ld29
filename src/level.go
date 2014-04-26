@@ -2,6 +2,7 @@ package main
 
 import (
 	twodee "../libs/twodee"
+	"fmt"
 	"github.com/kurrik/tmxgo"
 	"io/ioutil"
 	"strings"
@@ -36,7 +37,7 @@ func LoadLevel(path string) (l *Level, err error) {
 			return
 		}
 		grid = twodee.NewGrid(m.Width, m.Height)
-		for i, tile = range tiles {
+		for j, tile = range tiles {
 			if tile != nil {
 				grid.SetIndex(int32(i), true)
 			}
@@ -46,5 +47,17 @@ func LoadLevel(path string) (l *Level, err error) {
 	l = &Level{
 		Grids: grids,
 	}
+	return
+}
+
+func GetTexturePath(m *tmxgo.Map) (path string, err error) {
+	for i := 0; i < len(m.Tilesets); i++ {
+		if m.Tilesets[i].Image == nil {
+			continue
+		}
+		path = m.Tilesets[i].Image.Source
+		return
+	}
+	err = fmt.Errorf("Could not find suitable tileset")
 	return
 }
