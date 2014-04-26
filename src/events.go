@@ -26,7 +26,7 @@ type PlayerMoveEvent struct {
 func NewPlayerMoveEvent(pt *twodee.Point) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
 		twodee.NewBasicGameEvent(PlayerMove),
-		EndPoint: pt,
+		pt,
 	}
 	return
 }
