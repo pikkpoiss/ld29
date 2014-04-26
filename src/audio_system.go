@@ -40,7 +40,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	var (
 		exploreMusic *twodee.Music
 	)
-	if exploreMusic, err = twodee.NewMusic("assets/music/Journey_Theme_1.ogg"); err != nil {
+	if exploreMusic, err = twodee.NewMusic("assets/music/Exploration_Theme_1.ogg"); err != nil {
 		return
 	}
 	audioSystem = &AudioSystem{
