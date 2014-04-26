@@ -9,9 +9,24 @@ const (
 	DownLayer
 	UpWaterLevel
 	DownWaterLevel
+	PlayerMove
+	GameIsClosing
 	sentinel
 )
 
 const (
 	NumGameEventTypes = int(sentinel)
 )
+
+type PlayerMoveEvent struct {
+	*twodee.BasicGameEvent
+	EndPoint *twodee.Point
+}
+
+func NewPlayerMoveEvent(pt *twodee.Point) (e *PlayerMoveEvent) {
+	e = &PlayerMoveEvent{
+		twodee.NewBasicGameEvent(PlayerMove),
+		pt,
+	}
+	return
+}
