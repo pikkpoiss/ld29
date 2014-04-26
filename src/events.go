@@ -22,14 +22,14 @@ const (
 	NumGameEventTypes = int(sentinel)
 )
 
-type MoveDirection int
+type MoveDirection byte
 
 const (
-	North MoveDirection = iota
+	None  MoveDirection = iota
+	North MoveDirection = 1 << (iota - 1)
 	East
 	South
 	West
-	None
 )
 
 type PlayerMoveEvent struct {
