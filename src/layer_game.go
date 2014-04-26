@@ -1,9 +1,10 @@
 package main
 
 import (
-	"time"
-
 	twodee "../libs/twodee"
+	"os"
+	"strings"
+	"time"
 )
 
 type GameLayer struct {
@@ -33,7 +34,23 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 }
 
 func (l *GameLayer) LoadLevel(path string) (err error) {
-	l.Level, err = LoadLevel(path, l.App.GameEventHandler)
+	var (
+		dir        *os.File
+		candidates []string
+		names      = []string{}
+	)
+	if dir, err = os.Open(path); err != nil {
+		return
+	}
+	if candidates, err = dir.Readdirnames(0); err != nil {
+		return
+	}
+	for _, name := range candidates {
+		if strings.HasPrefix(name, "layer") {
+			names = append(names, name)
+		}
+	}
+	l.Level, err = LoadLevel(path, names, l.App.GameEventHandler)
 	return
 }
 

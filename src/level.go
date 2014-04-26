@@ -1,13 +1,11 @@
 package main
 
 import (
+	twodee "../libs/twodee"
 	"fmt"
+	"github.com/kurrik/tmxgo"
 	"io/ioutil"
 	"path/filepath"
-	"strings"
-
-	twodee "../libs/twodee"
-	"github.com/kurrik/tmxgo"
 )
 
 type Level struct {
@@ -23,59 +21,19 @@ func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	fmt.Println("Got player move event.")
 }
 
-func LoadLevel(path string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
+func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
 	var (
-		data     []byte
-		m        *tmxgo.Map
-		layer    tmxgo.Layer
-		i, j     int
-		grids    = []*twodee.Grid{}
-		grid     *twodee.Grid
-		maptiles []*tmxgo.Tile
-		textiles []twodee.TexturedTile
-		maptile  *tmxgo.Tile
-		tilemeta twodee.TileMetadata
-		batch    *twodee.Batch
-		batches  = []*twodee.Batch{}
-		player   *Player
+		player  *Player
+		grid    *twodee.Grid
+		batch   *twodee.Batch
+		grids   = []*twodee.Grid{}
+		batches = []*twodee.Batch{}
 	)
-	if data, err = ioutil.ReadFile(path); err != nil {
-		return
-	}
-	if m, err = tmxgo.ParseMapString(string(data)); err != nil {
-		return
-	}
-	if path, err = GetTexturePath(m, path); err != nil {
-		return
-	}
-	tilemeta = twodee.TileMetadata{
-		Path:      path,
-		PxPerUnit: 32,
-	}
-	for i = len(m.Layers) - 1; i >= 0; i-- {
-		layer = m.Layers[i]
-		if !strings.HasPrefix(layer.Name, "layer") {
-			continue
-		}
-		if maptiles, err = m.TilesFromLayerIndex(int32(i)); err != nil {
+	for _, name := range names {
+		if grid, batch, err = loadLayer(path, name); err != nil {
 			return
-		}
-		grid = twodee.NewGrid(m.Width, m.Height)
-		for j, maptile = range maptiles {
-			if maptile != nil {
-				grid.SetIndex(int32(j), true)
-			}
 		}
 		grids = append(grids, grid)
-		textiles = make([]twodee.TexturedTile, len(maptiles))
-		for j, maptile = range maptiles {
-			if maptile != nil {
-				textiles[j] = maptile
-			}
-		}
-		if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
-			return
-		}
 		batches = append(batches, batch)
 	}
 	player = NewPlayer(twodee.NewBaseEntity(1, 1, 32, 32, 0, 0))
@@ -90,7 +48,55 @@ func LoadLevel(path string, eventSystem *twodee.GameEventHandler) (l *Level, err
 	return
 }
 
-func GetTexturePath(m *tmxgo.Map, path string) (out string, err error) {
+func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, err error) {
+	var (
+		tilemeta twodee.TileMetadata
+		maptiles []*tmxgo.Tile
+		textiles []twodee.TexturedTile
+		maptile  *tmxgo.Tile
+		m        *tmxgo.Map
+		i        int
+		data     []byte
+	)
+	path = filepath.Join(filepath.Dir(path), name)
+	if data, err = ioutil.ReadFile(path); err != nil {
+		return
+	}
+	if m, err = tmxgo.ParseMapString(string(data)); err != nil {
+		return
+	}
+	if path, err = getTexturePath(m, path); err != nil {
+		return
+	}
+	tilemeta = twodee.TileMetadata{
+		Path:      path,
+		PxPerUnit: 32,
+	}
+	if maptiles, err = m.TilesFromLayerName("collision"); err != nil {
+		return
+	}
+	grid = twodee.NewGrid(m.Width, m.Height)
+	for i, maptile = range maptiles {
+		if maptile != nil {
+			grid.SetIndex(int32(i), true)
+		}
+	}
+	if maptiles, err = m.TilesFromLayerName("tiles"); err != nil {
+		return
+	}
+	textiles = make([]twodee.TexturedTile, len(maptiles))
+	for i, maptile = range maptiles {
+		if maptile != nil {
+			textiles[i] = maptile
+		}
+	}
+	if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
+		return
+	}
+	return
+}
+
+func getTexturePath(m *tmxgo.Map, path string) (out string, err error) {
 	var prefix = filepath.Dir(path)
 	for i := 0; i < len(m.Tilesets); i++ {
 		if m.Tilesets[i].Image == nil {
