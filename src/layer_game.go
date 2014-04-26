@@ -28,6 +28,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
 	}
+	layer.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
 	return
 }
 
