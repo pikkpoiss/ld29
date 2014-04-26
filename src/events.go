@@ -14,6 +14,7 @@ const (
 	PlayExploreMusic
 	PauseMusic
 	ResumeMusic
+	PlayerPickedUpItem
 	sentinel
 )
 
@@ -40,6 +41,19 @@ func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
 		twodee.NewBasicGameEvent(PlayerMove),
 		direction,
+	}
+	return
+}
+
+type PlayerPickedUpItemEvent struct {
+	*twodee.BasicGameEvent
+	Item *Item
+}
+
+func NewPlayerPickedUpItemEvent(i *Item) (e *PlayerPickedUpItemEvent) {
+	e = &PlayerPickedUpItemEvent{
+		twodee.NewBasicGameEvent(PlayerPickedUpItem),
+		i,
 	}
 	return
 }

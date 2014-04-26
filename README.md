@@ -20,7 +20,7 @@ Theme: "Beneath the surface"
   * [ ] Collision detection.
   * [ ] Items.
   * [ ] Level tiles for dry, partial, drowned levels.
-  * [ ] Menus.
+  * [x] Menus.
   * [ ] Load player sprite sheet.
   * [ ] Optimize top/player/bottom rendering.
   * [ ] Triggers for running over items and transition tiles.
