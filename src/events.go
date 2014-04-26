@@ -12,6 +12,8 @@ const (
 	PlayerMove
 	GameIsClosing
 	PlayExploreMusic
+	PauseMusic
+	ResumeMusic
 	sentinel
 )
 
