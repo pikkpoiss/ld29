@@ -11,14 +11,12 @@ import (
 type Level struct {
 	Grids               []*twodee.Grid
 	Geometry            []*twodee.Batch
+	GridRatios          []float32
 	Layers              int
 	Player              *Player
+	Active              int32
 	eventSystem         *twodee.GameEventHandler
 	onPlayerMoveEventId int
-}
-
-func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
-	fmt.Println("Got player move event.")
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
@@ -28,19 +26,24 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 		batch   *twodee.Batch
 		grids   = []*twodee.Grid{}
 		batches = []*twodee.Batch{}
+		ratio   float32
+		ratios  = []float32{}
 	)
 	for _, name := range names {
-		if grid, batch, err = loadLayer(path, name); err != nil {
+		if grid, batch, ratio, err = loadLayer(path, name); err != nil {
 			return
 		}
 		grids = append(grids, grid)
 		batches = append(batches, batch)
+		ratios = append(ratios, ratio)
 	}
-	player = NewPlayer(twodee.NewBaseEntity(1, 1, 32, 32, 0, 0))
+	player = NewPlayer(twodee.NewBaseEntity(1, 1, 1, 1, 0, 0))
 	l = &Level{
 		Grids:       grids,
 		Geometry:    batches,
 		Layers:      len(grids),
+		GridRatios:  ratios,
+		Active:      0,
 		Player:      player,
 		eventSystem: eventSystem,
 	}
@@ -48,7 +51,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	return
 }
 
-func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, err error) {
+func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, ratio float32, err error) {
 	var (
 		tilemeta twodee.TileMetadata
 		maptiles []*tmxgo.Tile
@@ -93,6 +96,7 @@ func loadLayer(path, name string) (grid *twodee.Grid, batch *twodee.Batch, err e
 	if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
 		return
 	}
+	ratio = float32(grid.Width) * float32(tilemeta.PxPerUnit) / float32(m.TileWidth*m.Width)
 	return
 }
 
@@ -114,4 +118,69 @@ func (l *Level) Delete() {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
+}
+
+func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
+	fmt.Printf("Got player move event: %v\n", e)
+	var (
+		move *PlayerMoveEvent
+		ok   bool
+	)
+	if move, ok = e.(*PlayerMoveEvent); ok == false {
+		return
+	}
+	l.AttemptMove(l.Player, l.Player.Speed, move.Dir)
+}
+
+func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
+	var (
+		ratio = l.GridRatios[layer]
+		xmin  = int32(a.X * ratio)
+		xmax  = int32(b.X * ratio)
+		ymin  = int32(a.Y * ratio)
+		ymax  = int32(b.Y * ratio)
+	)
+	for x := xmin; x <= xmax; x++ {
+		for y := ymin; y <= ymax; y++ {
+			fmt.Printf("Checking X %v Y %v\n", x, y)
+			if l.Grids[layer].Get(x, y) == true {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (l *Level) AttemptMove(entity twodee.Entity, speed float32, direction MoveDirection) bool {
+	var (
+		a, b   twodee.Point
+		bounds = entity.Bounds()
+		pos    = entity.Pos()
+	)
+	switch direction {
+	case North:
+		fmt.Printf("North\n")
+		a = twodee.Pt(bounds.Min.X, bounds.Max.Y+speed)
+		b = twodee.Pt(bounds.Max.X, bounds.Max.Y+speed)
+		pos.Y += speed
+	case South:
+		fmt.Printf("South\n")
+		a = twodee.Pt(bounds.Min.X, bounds.Min.Y-speed)
+		b = twodee.Pt(bounds.Max.X, bounds.Min.Y-speed)
+		pos.Y -= speed
+	case East:
+		fmt.Printf("East\n")
+		a = twodee.Pt(bounds.Max.X+speed, bounds.Min.Y)
+		b = twodee.Pt(bounds.Max.X+speed, bounds.Max.Y)
+		pos.X += speed
+	case West:
+		fmt.Printf("West\n")
+		a = twodee.Pt(bounds.Min.X-speed, bounds.Min.Y)
+		b = twodee.Pt(bounds.Min.X-speed, bounds.Max.Y)
+		pos.X -= speed
+	}
+	if l.FrontierCollides(l.Active, a, b) == false {
+		entity.MoveTo(pos)
+	}
+	return true
 }

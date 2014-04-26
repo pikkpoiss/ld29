@@ -162,15 +162,17 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		case twodee.KeyEscape:
 			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
 		case twodee.KeyUp:
-			l.LayerRewind()
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
 		case twodee.KeyRight:
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
 		case twodee.KeyDown:
-			l.LayerAdvance()
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
 		case twodee.KeyLeft:
 			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
+		case twodee.KeyJ:
+			l.LayerRewind()
+		case twodee.KeyK:
+			l.LayerAdvance()
 		case twodee.KeyM:
 			if twodee.MusicIsPaused() {
 				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
