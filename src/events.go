@@ -11,7 +11,10 @@ const (
 	DownWaterLevel
 	PlayerMove
 	GameIsClosing
+	PlayOutdoorMusic
 	PlayExploreMusic
+	PlayWarningMusic
+	PlayDangerMusic
 	PauseMusic
 	ResumeMusic
 	PlayerPickedUpItem
