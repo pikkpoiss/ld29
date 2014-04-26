@@ -81,7 +81,7 @@ func (l *GameLayer) Render() {
 			l.BatchRenderer.Unbind()
 			l.TileRenderer.Bind()
 			pt := l.Level.Player.Pos()
-			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, false, false)
+			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}

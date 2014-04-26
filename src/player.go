@@ -11,6 +11,30 @@ type Player struct {
 	Velocity    twodee.Point
 	DesiredMove MoveDirection
 	Inventory   []*Item
+	State       EntityState
+}
+
+type EntityState int32
+
+const (
+	_                    = iota
+	Standing EntityState = 1 << iota
+	Walking
+	Left
+	Right
+	Up
+	Down
+)
+
+var PlayerAnimations = map[EntityState][]int{
+	Standing | Up:    []int{24},
+	Standing | Down:  []int{8},
+	Standing | Left:  []int{16},
+	Standing | Right: []int{16},
+	Walking | Up:     []int{25, 26, 27, 28, 29, 30},
+	Walking | Down:   []int{9, 10, 11, 12, 13, 14},
+	Walking | Left:   []int{17, 18, 19, 20, 21, 22},
+	Walking | Right:  []int{17, 18, 19, 20, 21, 22},
 }
 
 func NewPlayer(x, y float32) (player *Player) {
@@ -34,6 +58,31 @@ func NewPlayer(x, y float32) (player *Player) {
 	return
 }
 
+func (p *Player) RemState(state EntityState) {
+	p.SetState(p.State & ^state)
+}
+
+func (p *Player) AddState(state EntityState) {
+	p.SetState(p.State | state)
+}
+
+func (p *Player) SwapState(rem, add EntityState) {
+	p.SetState(p.State & ^rem | add)
+}
+
+func (p *Player) SetState(state EntityState) {
+	if state != p.State {
+		p.State = state
+		if frames, ok := PlayerAnimations[p.State]; ok {
+			p.SetFrames(frames)
+		}
+	}
+}
+
+func (p *Player) FlippedX() bool {
+	return p.State&Left > 0
+}
+
 const Fudge = 0.01
 
 func (p *Player) AttemptMove(l *Level) {
@@ -44,27 +93,32 @@ func (p *Player) AttemptMove(l *Level) {
 	)
 	switch p.DesiredMove {
 	case None:
+		p.SwapState(Walking, Standing)
 		return
 	case North:
 		a = twodee.Pt(bounds.Min.X+Fudge, bounds.Max.Y+p.Speed)
 		b = twodee.Pt(bounds.Max.X-Fudge, bounds.Max.Y+p.Speed)
 		pos.Y += p.Speed
 		trunc = l.GridAlignedY(l.Active, pos)
+		p.SetState(Walking | Up)
 	case South:
 		a = twodee.Pt(bounds.Min.X+Fudge, bounds.Min.Y-p.Speed)
 		b = twodee.Pt(bounds.Max.X-Fudge, bounds.Min.Y-p.Speed)
 		pos.Y -= p.Speed
 		trunc = l.GridAlignedY(l.Active, pos)
+		p.SetState(Walking | Down)
 	case East:
 		a = twodee.Pt(bounds.Max.X+p.Speed, bounds.Min.Y+Fudge)
 		b = twodee.Pt(bounds.Max.X+p.Speed, bounds.Max.Y-Fudge)
 		pos.X += p.Speed
 		trunc = l.GridAlignedX(l.Active, pos)
+		p.SetState(Walking | Right)
 	case West:
 		a = twodee.Pt(bounds.Min.X-p.Speed, bounds.Min.Y+Fudge)
 		b = twodee.Pt(bounds.Min.X-p.Speed, bounds.Max.Y-Fudge)
 		pos.X -= p.Speed
 		trunc = l.GridAlignedX(l.Active, pos)
+		p.SetState(Walking | Left)
 	}
 	if l.FrontierCollides(l.Active, a, b) {
 		p.MoveTo(trunc)
