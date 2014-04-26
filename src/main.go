@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"runtime"
 	"time"
 
@@ -76,7 +77,7 @@ func (a *Application) Update(elapsed time.Duration) {
 }
 
 func (a *Application) Delete() {
-	a.GameEventHandler.RemoveObserver(GameIsClosing, gameClosingObserverId)
+	a.GameEventHandler.RemoveObserver(GameIsClosing, a.gameClosingObserverId)
 	a.layers.Delete()
 	a.AudioSystem.Delete()
 	a.Context.Delete()
@@ -98,8 +99,9 @@ func (a *Application) ProcessEvents() {
 	}
 }
 
-func (a *Application) CloseGame() {
-	InitiateCloseGame = true
+func (a *Application) CloseGame(e twodee.GETyper) {
+	fmt.Println("CloseGame method called")
+	a.InitiateCloseGame = true
 }
 
 func main() {
@@ -126,6 +128,7 @@ func main() {
 		app.Draw()
 		app.Context.Window.SwapBuffers()
 		app.Context.Events.Poll()
+		app.GameEventHandler.Poll()
 		app.ProcessEvents()
 		current_time = time.Now()
 	}
