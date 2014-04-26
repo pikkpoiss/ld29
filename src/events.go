@@ -21,19 +21,22 @@ const (
 	NumGameEventTypes = int(sentinel)
 )
 
+type MoveDirection int
+
 const (
-	North = iota
+	North MoveDirection = iota
 	East
 	South
 	West
+	None
 )
 
 type PlayerMoveEvent struct {
 	*twodee.BasicGameEvent
-	moveDir int
+	Dir MoveDirection
 }
 
-func NewPlayerMoveEvent(direction int) (e *PlayerMoveEvent) {
+func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
 		twodee.NewBasicGameEvent(PlayerMove),
 		direction,

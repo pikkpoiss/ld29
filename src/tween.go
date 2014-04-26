@@ -4,23 +4,35 @@ import (
 	"time"
 )
 
+type TweenCallback func()
+
 type Tween interface {
 	Update(d time.Duration)
 	Done() bool
 	Current() float32
+	SetCallback(callback TweenCallback)
 }
 
 type tween struct {
+	callback TweenCallback
 	duration time.Duration
 	elapsed  time.Duration
 }
 
 func (t *tween) Update(d time.Duration) {
 	t.elapsed += d
+	if t.callback != nil && t.Done() {
+		t.callback()
+		t.callback = nil
+	}
 }
 
 func (t *tween) Done() bool {
 	return t.elapsed >= t.duration
+}
+
+func (t *tween) SetCallback(callback TweenCallback) {
+	t.callback = callback
 }
 
 type LinearTween struct {
