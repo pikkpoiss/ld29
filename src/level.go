@@ -6,6 +6,7 @@ import (
 	"github.com/kurrik/tmxgo"
 	"io/ioutil"
 	"path/filepath"
+	"time"
 )
 
 type Level struct {
@@ -121,15 +122,25 @@ func (l *Level) Delete() {
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
-	fmt.Printf("Got player move event: %v\n", e)
-	var (
-		move *PlayerMoveEvent
-		ok   bool
-	)
-	if move, ok = e.(*PlayerMoveEvent); ok == false {
-		return
+	if move, ok := e.(*PlayerMoveEvent); ok {
+		l.Player.DesiredMove = move.Dir
 	}
-	l.AttemptMove(l.Player, l.Player.Speed, move.Dir)
+}
+
+func (l *Level) GridAlignedX(layer int32, p twodee.Point) twodee.Point {
+	var (
+		ratio = l.GridRatios[layer]
+		x     = int32(p.X*ratio + 0.5)
+	)
+	return twodee.Pt(float32(x)/ratio, p.Y)
+}
+
+func (l *Level) GridAlignedY(layer int32, p twodee.Point) twodee.Point {
+	var (
+		ratio = l.GridRatios[layer]
+		y     = int32(p.Y*ratio + 0.5)
+	)
+	return twodee.Pt(p.X, float32(y)/ratio)
 }
 
 func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
@@ -140,9 +151,10 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 		ymin  = int32(a.Y * ratio)
 		ymax  = int32(b.Y * ratio)
 	)
+	// fmt.Printf("X %v-%v, Y %v-%v\n", xmin, xmax, ymin, ymax)
 	for x := xmin; x <= xmax; x++ {
 		for y := ymin; y <= ymax; y++ {
-			fmt.Printf("Checking X %v Y %v\n", x, y)
+			// fmt.Printf("Checking X %v Y %v\n", x, y)
 			if l.Grids[layer].Get(x, y) == true {
 				return true
 			}
@@ -151,36 +163,7 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 	return false
 }
 
-func (l *Level) AttemptMove(entity twodee.Entity, speed float32, direction MoveDirection) bool {
-	var (
-		a, b   twodee.Point
-		bounds = entity.Bounds()
-		pos    = entity.Pos()
-	)
-	switch direction {
-	case North:
-		fmt.Printf("North\n")
-		a = twodee.Pt(bounds.Min.X, bounds.Max.Y+speed)
-		b = twodee.Pt(bounds.Max.X, bounds.Max.Y+speed)
-		pos.Y += speed
-	case South:
-		fmt.Printf("South\n")
-		a = twodee.Pt(bounds.Min.X, bounds.Min.Y-speed)
-		b = twodee.Pt(bounds.Max.X, bounds.Min.Y-speed)
-		pos.Y -= speed
-	case East:
-		fmt.Printf("East\n")
-		a = twodee.Pt(bounds.Max.X+speed, bounds.Min.Y)
-		b = twodee.Pt(bounds.Max.X+speed, bounds.Max.Y)
-		pos.X += speed
-	case West:
-		fmt.Printf("West\n")
-		a = twodee.Pt(bounds.Min.X-speed, bounds.Min.Y)
-		b = twodee.Pt(bounds.Min.X-speed, bounds.Max.Y)
-		pos.X -= speed
-	}
-	if l.FrontierCollides(l.Active, a, b) == false {
-		entity.MoveTo(pos)
-	}
-	return true
+func (l *Level) Update(elapsed time.Duration) {
+	l.Player.Update(elapsed)
+	l.Player.AttemptMove(l)
 }

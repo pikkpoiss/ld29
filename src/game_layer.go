@@ -121,6 +121,7 @@ func (l *GameLayer) Update(elapsed time.Duration) {
 			l.botTrans.Update(elapsed)
 		}
 	}
+	l.Level.Update(elapsed)
 }
 
 const TopSlideSpeed = time.Duration(500) * time.Millisecond
@@ -153,22 +154,37 @@ func (l *GameLayer) Reset() (err error) {
 }
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
+	var released bool
 	switch event := evt.(type) {
 	case *twodee.KeyEvent:
-		if event.Type == twodee.Release {
-			break
-		}
+		released = event.Type == twodee.Release
 		switch event.Code {
 		case twodee.KeyEscape:
 			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
 		case twodee.KeyUp:
-			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
+			if released {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+			} else {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
+			}
 		case twodee.KeyRight:
-			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
+			if released {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+			} else {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
+			}
 		case twodee.KeyDown:
-			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
+			if released {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+			} else {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
+			}
 		case twodee.KeyLeft:
-			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
+			if released {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+			} else {
+				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
+			}
 		case twodee.KeyJ:
 			l.LayerRewind()
 		case twodee.KeyK:
