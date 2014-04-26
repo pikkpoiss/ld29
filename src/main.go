@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"runtime"
 	"time"
 
@@ -100,7 +99,6 @@ func (a *Application) ProcessEvents() {
 }
 
 func (a *Application) CloseGame(e twodee.GETyper) {
-	fmt.Println("CloseGame method called")
 	a.InitiateCloseGame = true
 }
 
