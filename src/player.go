@@ -15,7 +15,7 @@ type Player struct {
 
 func NewPlayer(e *twodee.BaseEntity) (player *Player) {
 	var (
-		inv = make([]*Item, 0, 10)
+		inv = make([]*Item, 0, NumberOfItemTypes)
 	)
 	player = &Player{
 		BaseEntity:  e,
