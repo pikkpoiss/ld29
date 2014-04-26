@@ -10,6 +10,7 @@ const (
 	UpWaterLevel
 	DownWaterLevel
 	PlayerMoveEventType
+	GameIsClosing
 	sentinel
 )
 
