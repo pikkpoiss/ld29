@@ -15,7 +15,7 @@ type GameLayer struct {
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	layer = &GameLayer{
 		App:    app,
-		Bounds: twodee.Rect(0, 0, 20, 20),
+		Bounds: twodee.Rect(0, 0, 10, 10),
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
