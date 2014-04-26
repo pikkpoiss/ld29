@@ -10,19 +10,24 @@ import (
 )
 
 type Level struct {
-	Grids []*twodee.Grid
+	Grids    []*twodee.Grid
+	Geometry []*twodee.Batch
 }
 
 func LoadLevel(path string) (l *Level, err error) {
 	var (
-		data  []byte
-		m     *tmxgo.Map
-		layer tmxgo.Layer
-		i, j  int
-		grids = []*twodee.Grid{}
-		grid  *twodee.Grid
-		tiles []*tmxgo.Tile
-		tile  *tmxgo.Tile
+		data     []byte
+		m        *tmxgo.Map
+		layer    tmxgo.Layer
+		i, j     int
+		grids    = []*twodee.Grid{}
+		grid     *twodee.Grid
+		maptiles []*tmxgo.Tile
+		textiles []twodee.TexturedTile
+		maptile  *tmxgo.Tile
+		tilemeta twodee.TileMetadata
+		batch    *twodee.Batch
+		batches  = []*twodee.Batch{}
 	)
 	if data, err = ioutil.ReadFile(path); err != nil {
 		return
@@ -30,23 +35,39 @@ func LoadLevel(path string) (l *Level, err error) {
 	if m, err = tmxgo.ParseMapString(string(data)); err != nil {
 		return
 	}
+	if path, err = GetTexturePath(m, path); err != nil {
+		return
+	}
+	tilemeta = twodee.TileMetadata{
+		Path:      path,
+		PxPerUnit: 32,
+	}
 	for i, layer = range m.Layers {
 		if !strings.HasPrefix(layer.Name, "layer") {
 			continue
 		}
-		if tiles, err = m.TilesFromLayerIndex(int32(i)); err != nil {
+		if maptiles, err = m.TilesFromLayerIndex(int32(i)); err != nil {
 			return
 		}
 		grid = twodee.NewGrid(m.Width, m.Height)
-		for j, tile = range tiles {
-			if tile != nil {
+		for j, maptile = range maptiles {
+			if maptile != nil {
 				grid.SetIndex(int32(j), true)
 			}
 		}
 		grids = append(grids, grid)
+		textiles = make([]twodee.TexturedTile, len(maptiles))
+		for j, maptile = range maptiles {
+			textiles[j] = maptile
+		}
+		if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
+			return
+		}
+		batches = append(batches, batch)
 	}
 	l = &Level{
-		Grids: grids,
+		Grids:    grids,
+		Geometry: batches,
 	}
 	return
 }
