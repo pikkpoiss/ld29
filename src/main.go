@@ -18,16 +18,16 @@ type Application struct {
 	counter     *twodee.Counter
 	Context     *twodee.Context
 	AudioSystem *AudioSystem
-	WinBounds twodee.Rectangle
+	WinBounds   twodee.Rectangle
 }
 
 func NewApplication() (app *Application, err error) {
 	var (
-		layers      *twodee.Layers
-		context     *twodee.Context
-		winbounds   = twodee.Rect(0, 0, 600, 600)
-		counter     = twodee.NewCounter()
-		audioSystem *AudioSystem
+		layers    *twodee.Layers
+		context   *twodee.Context
+		winbounds = twodee.Rect(0, 0, 600, 600)
+		counter   = twodee.NewCounter()
+		gameLayer *GameLayer
 	)
 	if context, err = twodee.NewContext(); err != nil {
 		return
@@ -39,15 +39,21 @@ func NewApplication() (app *Application, err error) {
 	}
 	layers = twodee.NewLayers()
 	app = &Application{
-		layers:  layers,
-		counter: counter,
-		Context: context,
+		layers:    layers,
+		counter:   counter,
+		Context:   context,
 		WinBounds: winbounds,
 	}
-	if audioSystem, err = NewAudioSystem(app); err != nil {
+	if app.AudioSystem, err = NewAudioSystem(app); err != nil {
 		return
 	}
-	app.AudioSystem = audioSystem
+	if gameLayer, err = NewGameLayer(app); err != nil {
+		return
+	}
+	if err = gameLayer.LoadLevel("assets/level00/map.tmx"); err != nil {
+		return
+	}
+	layers.Push(gameLayer)
 	return
 }
 

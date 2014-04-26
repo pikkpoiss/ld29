@@ -1,13 +1,25 @@
 package main
 
-import ()
+import (
+	twodee "../libs/twodee"
+	"time"
+)
 
 type GameLayer struct {
-	Level *Level
+	Level         *Level
+	BatchRenderer *twodee.BatchRenderer
+	Bounds        twodee.Rectangle
+	App           *Application
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
-	layer = &GameLayer{}
+	layer = &GameLayer{
+		App:    app,
+		Bounds: twodee.Rect(0, 0, 20, 20),
+	}
+	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
+		return
+	}
 	return
 }
 
@@ -20,4 +32,27 @@ func (l *GameLayer) Delete() {
 	if l.Level != nil {
 		l.Level.Delete()
 	}
+}
+
+func (l *GameLayer) Render() {
+	var err error
+	l.BatchRenderer.Bind()
+	for _, geom := range l.Level.Geometry {
+		if err = l.BatchRenderer.Draw(geom, 0, 0, 0); err != nil {
+			panic(err)
+		}
+	}
+	l.BatchRenderer.Unbind()
+	return
+}
+
+func (l *GameLayer) Update(elapsed time.Duration) {
+}
+
+func (l *GameLayer) Reset() (err error) {
+	return
+}
+
+func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
+	return true
 }

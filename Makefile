@@ -3,4 +3,4 @@
 SOURCES = $(wildcard src/*.go)
 
 run:
-	go run $(SOURCES)
+	cd src; go run $(patsubst src/%,%,$(SOURCES)); cd -

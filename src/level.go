@@ -59,7 +59,9 @@ func LoadLevel(path string) (l *Level, err error) {
 		grids = append(grids, grid)
 		textiles = make([]twodee.TexturedTile, len(maptiles))
 		for j, maptile = range maptiles {
-			textiles[j] = maptile
+			if maptile != nil {
+				textiles[j] = maptile
+			}
 		}
 		if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
 			return
