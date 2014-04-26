@@ -13,6 +13,7 @@ const (
 
 const (
 	ExitCode int32 = iota
+	MusicCode
 )
 
 type MenuLayer struct {
@@ -46,6 +47,7 @@ func NewMenuLayer(window twodee.Rectangle, App *Application) (layer *MenuLayer, 
 		return
 	}
 	menu, err = twodee.NewMenu([]twodee.MenuItem{
+		twodee.NewKeyValueMenuItem("Music On/Off", ProgramCode, MusicCode),
 		twodee.NewKeyValueMenuItem("Exit", ProgramCode, ExitCode),
 	})
 	if err != nil {
@@ -204,6 +206,12 @@ func (l *MenuLayer) handleMenuItem(data *twodee.MenuItemData) {
 	switch data.Key {
 	case ProgramCode:
 		switch data.Value {
+		case MusicCode:
+			if twodee.MusicIsPaused() {
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
+			} else {
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+			}
 		case ExitCode:
 			l.App.InitiateCloseGame = true
 		}
