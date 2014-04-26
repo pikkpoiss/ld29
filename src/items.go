@@ -1,5 +1,9 @@
 package main
 
+import (
+	"../libs/twodee"
+)
+
 type ItemType int
 
 const (
@@ -16,6 +20,7 @@ const (
 )
 
 type Item struct {
+	*twodee.BaseEntity
 	Id   ItemType
 	Name string
 }

@@ -1,17 +1,19 @@
 package main
 
 import (
-	twodee "../libs/twodee"
 	"fmt"
-	"github.com/kurrik/tmxgo"
 	"io/ioutil"
 	"path/filepath"
 	"time"
+
+	twodee "../libs/twodee"
+	"github.com/kurrik/tmxgo"
 )
 
 type Level struct {
 	Height              float32
 	Grids               []*twodee.Grid
+	Items               [][]*Item
 	Geometry            []*twodee.Batch
 	GridRatios          []float32
 	Layers              int32
@@ -27,6 +29,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	l = &Level{
 		Height:      0,
 		Grids:       []*twodee.Grid{},
+		Items:       [][]*Item{},
 		Geometry:    []*twodee.Batch{},
 		GridRatios:  []float32{},
 		Layers:      0,
@@ -54,6 +57,7 @@ func (l *Level) loadLayer(path, name string) (err error) {
 		data     []byte
 		height   float32
 		grid     *twodee.Grid
+		items    []*Item
 		batch    *twodee.Batch
 		ratio    float32
 	)
@@ -83,6 +87,7 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if maptiles, err = m.TilesFromLayerName("tiles"); err != nil {
 		return
 	}
+	// TODO: Somewhere in here we should load a bunch of *Items into items.
 	textiles = make([]twodee.TexturedTile, len(maptiles))
 	for i, maptile = range maptiles {
 		if maptile != nil {
@@ -98,6 +103,7 @@ func (l *Level) loadLayer(path, name string) (err error) {
 		l.Height = height
 	}
 	l.Grids = append(l.Grids, grid)
+	l.Items = append(l.Items, items)
 	l.Geometry = append(l.Geometry, batch)
 	l.Layers += 1
 	l.Transitions = append(l.Transitions, nil)
@@ -148,6 +154,8 @@ func (l *Level) GridAlignedY(layer int32, p twodee.Point) twodee.Point {
 	return twodee.Pt(p.X, float32(y)/ratio)
 }
 
+// Given points a,b defining the leading edge of a moving entity; determine
+// if there is a collision with something on the grid.
 func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 	var (
 		ratio = l.GridRatios[layer]
@@ -163,6 +171,13 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 			if l.Grids[layer].Get(x, y) == true {
 				return true
 			}
+		}
+	}
+	playerBounds := l.Player.Bounds()
+	for _, item := range l.Items[layer] {
+		if playerBounds.Overlaps(item.Bounds()) {
+			l.eventSystem.Enqueue(NewPlayerPickedUpItemEvent(item))
+			break
 		}
 	}
 	return false
