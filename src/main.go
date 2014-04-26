@@ -57,7 +57,7 @@ func NewApplication() (app *Application, err error) {
 	if gameLayer, err = NewGameLayer(app); err != nil {
 		return
 	}
-	if err = gameLayer.LoadLevel("assets/level00/map.tmx"); err != nil {
+	if err = gameLayer.LoadLevel("assets/level00/"); err != nil {
 		return
 	}
 	layers.Push(gameLayer)
