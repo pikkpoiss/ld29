@@ -1,8 +1,9 @@
 package main
 
 import (
-	twodee "../libs/twodee"
 	"time"
+
+	twodee "../libs/twodee"
 )
 
 type GameLayer struct {
@@ -31,7 +32,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 }
 
 func (l *GameLayer) LoadLevel(path string) (err error) {
-	l.Level, err = LoadLevel(path)
+	l.Level, err = LoadLevel(path, l.App.GameEventHandler)
 	return
 }
 
