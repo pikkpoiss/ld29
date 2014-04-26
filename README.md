@@ -11,13 +11,22 @@ Theme: "Beneath the surface"
 ## Tasks
 
   * [x] Come up with idea.
-  * [ ] Main game loop.
-  * [ ] Level loading.
+  * [x] Main game loop.
+  * [x] Level loading.
+  * [x] Vertical level switching.
+  * [x] Music loading.
   * [ ] Water tracking / gauge.
-  * [ ] Vertical level switching.
-  * [ ] Movement.
+  * [ ] Player movement.
+  * [ ] Collision detection.
   * [ ] Items.
   * [ ] Level tiles for dry, partial, drowned levels.
+  * [ ] Menus.
+  * [ ] Load player sprite sheet.
+  * [ ] Optimize top/player/bottom rendering.
+  * [ ] Triggers for running over items and transition tiles.
+  * [ ] Sound effects
+  * [ ] End state
+  * [ ] Pickaxe and barriers.
 
 ## Brainstorming
 
