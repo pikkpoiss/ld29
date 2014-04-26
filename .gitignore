@@ -24,3 +24,5 @@ _testmain.go
 
 # VIM tmp files
 *.swp
+
+tags
