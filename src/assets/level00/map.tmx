@@ -3,14 +3,14 @@
  <tileset firstgid="1" name="tiles.fw" tilewidth="16" tileheight="16">
   <image source="tiles.fw.png" width="256" height="256"/>
  </tileset>
- <layer name="layer1" width="20" height="20">
-  <data encoding="base64" compression="zlib">
-   eJxjZGBgYKQiZmKgHmAeNW/UvFHzRs0bNY9q5rFQGQMApL8Avw==
-  </data>
- </layer>
  <layer name="layer2" width="20" height="20">
   <data encoding="base64" compression="zlib">
    eJxjYKA+EKASRjaPGm4aNW/UvFHzRs0biuZRszylJgAAV4MEQQ==
+  </data>
+ </layer>
+ <layer name="layer1" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYKQiZmKgHmAeNW/UvFHzRs0bNY9q5rFQGQMApL8Avw==
   </data>
  </layer>
 </map>
