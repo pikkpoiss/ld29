@@ -25,7 +25,7 @@ type Level struct {
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(twodee.NewBaseEntity(1, 1, 1, 1, 0, 0))
+	var player = NewPlayer(1,1)
 	l = &Level{
 		Height:      0,
 		Grids:       []*twodee.Grid{},

@@ -5,7 +5,7 @@ import (
 )
 
 type Player struct {
-	*twodee.BaseEntity
+	*twodee.AnimatingEntity
 	Health      float32
 	Speed       float32
 	Velocity    twodee.Point
@@ -13,12 +13,18 @@ type Player struct {
 	Inventory   []*Item
 }
 
-func NewPlayer(e *twodee.BaseEntity) (player *Player) {
+func NewPlayer(x, y float32) (player *Player) {
 	var (
 		inv = make([]*Item, 0, NumberOfItemTypes)
 	)
 	player = &Player{
-		BaseEntity:  e,
+		AnimatingEntity: twodee.NewAnimatingEntity(
+			x, y,
+			1, 1,
+			0,
+			twodee.Step10Hz,
+			[]int{8},
+		),
 		Health:      100.0,
 		Speed:       0.2,
 		Velocity:    twodee.Pt(0, 0),
