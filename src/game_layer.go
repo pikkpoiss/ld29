@@ -66,6 +66,7 @@ func (l *GameLayer) Delete() {
 func (l *GameLayer) Render() {
 	l.BatchRenderer.Bind()
 	var i int32
+	var y float32
 	for i = l.Level.Layers - 1; i >= 0; i-- {
 		switch {
 		case i == l.Level.Active:
@@ -73,32 +74,14 @@ func (l *GameLayer) Render() {
 		case i == l.Level.Active+1:
 			fallthrough
 		case i == l.Level.Active-1:
-			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, l.Level.GetLayerY(i), 0)
+			y = l.Level.GetLayerY(i)
+			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
 		}
-		/*
-			y = 0.0
-			if i == l.topLayer {
-				if l.topTrans != nil {
-					y = l.topTrans.Current()
-				} else if l.topLayer != l.playerLayer {
-					y = l.Bounds.Max.Y
-				}
-			} else if i == l.botLayer {
-				if l.botTrans != nil {
-					y = l.botTrans.Current()
-				} else if l.botLayer != l.playerLayer {
-					y = -1.0
-				}
-			}
-			if i == l.topLayer || i == l.botLayer {
-				l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
-			}
-		*/
 		if i == l.Level.Active {
 			l.BatchRenderer.Unbind()
 			l.TileRenderer.Bind()
 			pt := l.Level.Player.Pos()
-			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y, 0, false, false)
+			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y + y, 0, false, false)
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}
