@@ -1,8 +1,9 @@
 package main
 
 import (
-	twodee "../libs/twodee"
 	"time"
+
+	twodee "../libs/twodee"
 )
 
 type GameLayer struct {
@@ -31,7 +32,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 }
 
 func (l *GameLayer) LoadLevel(path string) (err error) {
-	l.Level, err = LoadLevel(path)
+	l.Level, err = LoadLevel(path, l.App.GameEventHandler)
 	return
 }
 
@@ -121,12 +122,16 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		switch event.Code {
 		case twodee.KeyEscape:
 			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
-		case twodee.KeyLeft:
-		case twodee.KeyRight:
 		case twodee.KeyUp:
 			l.LayerRewind()
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
+		case twodee.KeyRight:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
 		case twodee.KeyDown:
 			l.LayerAdvance()
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
+		case twodee.KeyLeft:
+			l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
 		}
 	}
 	return true
