@@ -190,8 +190,24 @@ func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
 				l.LayerAdvance()
 			}
 		case InventoryItem:
+			l.RemoveItem(pickup.Item)
 			l.Player.AddToInventory(pickup.Item)
 		}
+	}
+}
+
+// Removes the item from the current layer's Items slice.
+func (l *Level) RemoveItem(item *Item) {
+	layerItems := l.Items[l.Active]
+	index := -1
+	for i, levelItem := range layerItems {
+		if levelItem == item {
+			index = i
+			break
+		}
+	}
+	if index != -1 {
+		layerItems = append(layerItems[:index], layerItems[index+1:]...)
 	}
 }
 
