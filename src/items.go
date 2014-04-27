@@ -6,12 +6,16 @@ import (
 
 type ItemType int
 
+// Corresponds with frame indices
 const (
-	Item1 ItemType = iota
+	_                 = iota
+	ItemDown ItemType = iota
+	ItemUp
+	Item1
 	Item2
 	Item3
 	Item4
-	Item5
+	ItemFinal
 	item_sentinel
 )
 
@@ -25,10 +29,11 @@ type Item struct {
 	Name string
 }
 
-func NewItem(itemType ItemType, name string) (item *Item) {
+func NewItem(itemType ItemType, name string, x, y, w, h float32) (item *Item) {
 	item = &Item{
-		Id:   itemType,
-		Name: name,
+		BaseEntity: twodee.NewBaseEntity(x, y, w, h, 0, int(itemType)),
+		Id:         itemType,
+		Name:       name,
 	}
 	return
 }

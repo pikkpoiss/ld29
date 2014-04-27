@@ -74,6 +74,7 @@ type Player struct {
 	DesiredMove       MoveDirection
 	Inventory         []*Item
 	State             EntityState
+	CanGetItem        bool
 }
 
 type EntityState int32
@@ -106,17 +107,18 @@ func NewPlayer(x, y float32) (player *Player) {
 	player = &Player{
 		AnimatingEntity: twodee.NewAnimatingEntity(
 			x, y,
-			1, 1,
+			32.0/PxPerUnit, 32.0/PxPerUnit,
 			0,
 			twodee.Step10Hz,
 			[]int{8},
 		),
 		Health:            100.0,
-		Speed:             0.2,
+		Speed:             PlayerBaseSpeed,
 		Velocity:          twodee.Pt(0, 0),
 		DirectionsHistory: NewDirectionsHistory(),
 		DesiredMove:       None,
 		Inventory:         inv,
+		CanGetItem:        true,
 	}
 	return
 }
@@ -208,6 +210,12 @@ func (p *Player) AttemptMove(l *Level) {
 	}
 }
 
+const (
+	PlayerBaseSpeed      = 0.2
+	PlayerFastSpeed      = 0.3
+	PlayerSuperFastSpeed = 0.4
+)
+
 func (p *Player) AddToInventory(item *Item) {
 	p.Inventory = append(p.Inventory, item)
 	switch item.getType() {
@@ -218,8 +226,12 @@ func (p *Player) AddToInventory(item *Item) {
 	case Item3:
 		p.Health = p.Health + 30
 	case Item4:
-		p.Speed = p.Speed + 10
-	case Item5:
-		p.Speed = p.Speed + 20
+		if p.Speed < PlayerFastSpeed {
+			p.Speed = PlayerFastSpeed
+		}
+	case ItemFinal:
+		if p.Speed < PlayerSuperFastSpeed {
+			p.Speed = PlayerSuperFastSpeed
+		}
 	}
 }

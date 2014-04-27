@@ -11,33 +11,37 @@ import (
 )
 
 type Level struct {
-	Height              float32
-	Grids               []*twodee.Grid
-	Items               [][]*Item
-	Geometry            []*twodee.Batch
-	GridRatios          []float32
-	Layers              int32
-	Player              *Player
-	Active              int32
-	Transitions         []*LinearTween
-	eventSystem         *twodee.GameEventHandler
-	onPlayerMoveEventId int
+	Height                      float32
+	Grids                       []*twodee.Grid
+	Items                       [][]*Item
+	Geometry                    []*twodee.Batch
+	GridRatios                  []float32
+	Layers                      int32
+	Player                      *Player
+	Active                      int32
+	Transitions                 []*LinearTween
+	eventSystem                 *twodee.GameEventHandler
+	onPlayerMoveEventId         int
+	onPlayerPickedUpItemEventId int
+	WaterAccumulation           time.Duration
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(1, 1)
+	var player = NewPlayer(2, 2)
 	l = &Level{
-		Height:      0,
-		Grids:       []*twodee.Grid{},
-		Items:       [][]*Item{},
-		Geometry:    []*twodee.Batch{},
-		GridRatios:  []float32{},
-		Layers:      0,
-		Active:      0,
-		Player:      player,
-		eventSystem: eventSystem,
+		Height:            0,
+		Grids:             []*twodee.Grid{},
+		Items:             [][]*Item{},
+		Geometry:          []*twodee.Batch{},
+		GridRatios:        []float32{},
+		Layers:            0,
+		Active:            0,
+		Player:            player,
+		eventSystem:       eventSystem,
+		WaterAccumulation: 0,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
+	l.onPlayerPickedUpItemEventId = eventSystem.AddObserver(PlayerPickedUpItem, l.OnPlayerPickedUpItemEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
 			return
@@ -45,6 +49,18 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	}
 	return
 }
+
+const LevelWaterThreshold time.Duration = time.Duration(30) * time.Second
+
+type LayerWaterStatus int
+
+const (
+	Dry LayerWaterStatus = iota
+	Wet
+	Flooded
+)
+
+const PxPerUnit float32 = 16.0
 
 func (l *Level) loadLayer(path, name string) (err error) {
 	var (
@@ -73,7 +89,22 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	}
 	tilemeta = twodee.TileMetadata{
 		Path:      path,
-		PxPerUnit: 32,
+		PxPerUnit: int(PxPerUnit),
+	}
+	if maptiles, err = m.TilesFromLayerName("entities"); err != nil {
+		return
+	}
+	for i, maptile = range maptiles {
+		if maptile != nil {
+			items = append(items, NewItem(
+				ItemType(maptile.Index),
+				"item",
+				(maptile.TileBounds.X+maptile.TileBounds.W)/PxPerUnit,
+				(maptile.TileBounds.Y+maptile.TileBounds.H)/PxPerUnit,
+				maptile.TileBounds.W/PxPerUnit,
+				maptile.TileBounds.H/PxPerUnit,
+			))
+		}
 	}
 	if maptiles, err = m.TilesFromLayerName("collision"); err != nil {
 		return
@@ -87,7 +118,6 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if maptiles, err = m.TilesFromLayerName("tiles"); err != nil {
 		return
 	}
-	// TODO: Somewhere in here we should load a bunch of *Items into items.
 	textiles = make([]twodee.TexturedTile, len(maptiles))
 	for i, maptile = range maptiles {
 		if maptile != nil {
@@ -97,7 +127,8 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
 		return
 	}
-	ratio = float32(grid.Width) * float32(tilemeta.PxPerUnit) / float32(m.TileWidth*m.Width)
+	//batch.SetTextureOffsetPx(0, 16)
+	ratio = float32(grid.Width) * PxPerUnit / float32(m.TileWidth*m.Width)
 	height = float32(grid.Height) / ratio
 	if l.Height < height {
 		l.Height = height
@@ -130,12 +161,30 @@ func (l *Level) Delete() {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
+	l.eventSystem.RemoveObserver(PlayerPickedUpItem, l.onPlayerPickedUpItemEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	if move, ok := e.(*PlayerMoveEvent); ok {
 		l.Player.UpdateDesiredMove(move.Dir, move.Inverse)
 		//		l.Player.DesiredMove = move.Dir
+	}
+}
+
+func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
+	if !l.Player.CanGetItem {
+		return
+	}
+	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
+		l.Player.CanGetItem = false
+		switch pickup.Item.Id {
+		case ItemUp:
+			l.LayerRewind()
+		case ItemDown:
+			l.LayerAdvance()
+		default:
+			l.Player.AddToInventory(pickup.Item)
+		}
 	}
 }
 
@@ -175,11 +224,18 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 		}
 	}
 	playerBounds := l.Player.Bounds()
+	touchedItem := false
 	for _, item := range l.Items[layer] {
 		if playerBounds.Overlaps(item.Bounds()) {
 			l.eventSystem.Enqueue(NewPlayerPickedUpItemEvent(item))
+			touchedItem = true
 			break
 		}
+	}
+	if !touchedItem {
+		// Prevent the player from triggering another item
+		// pickup until they've moved off of all items
+		l.Player.CanGetItem = true
 	}
 	return false
 }
@@ -236,4 +292,20 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	l.Player.Update(elapsed)
 	l.Player.AttemptMove(l)
+	l.WaterAccumulation += elapsed
+}
+
+func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
+	var percentFlooded = (int32)(l.WaterAccumulation / LevelWaterThreshold)
+	if percentFlooded >= 1 {
+		return Flooded
+	}
+	var layerLevelBottom = (l.Layers - layer) / l.Layers
+	var layerLevelTop = ((l.Layers - layer) + 1) / l.Layers
+	if percentFlooded >= layerLevelTop {
+		return Flooded
+	} else if percentFlooded >= layerLevelBottom {
+		return Wet
+	}
+	return Dry
 }
