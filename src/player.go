@@ -1,8 +1,9 @@
 package main
 
 import (
-	"../libs/twodee"
 	"time"
+
+	"../libs/twodee"
 )
 
 type DirectionsHistoryEntry struct {
@@ -84,6 +85,7 @@ type Player struct {
 	IsPumping         bool
 	destroyableItems  map[ItemId]bool
 	HasFinalItem      bool
+	LastUsed          *Item
 }
 
 type EntityState int32
@@ -148,6 +150,7 @@ func NewPlayer(x, y float32, eventSystem *twodee.GameEventHandler) (player *Play
 		IsPumping:         false,
 		HasFinalItem:      false,
 		destroyableItems:  make(map[ItemId]bool),
+		LastUsed:          nil,
 	}
 	return
 }

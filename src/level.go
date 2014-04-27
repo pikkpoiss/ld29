@@ -25,6 +25,7 @@ type Level struct {
 	onPlayerTouchedItemEventId   int
 	onPlayerDestroyedItemEventId int
 	onPlayerUsedItemEventId      int
+	onPlayerPumpedEventId        int
 	WaterAccumulation            time.Duration
 	Paused                       bool
 }
@@ -49,6 +50,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	l.onPlayerTouchedItemEventId = eventSystem.AddObserver(PlayerTouchedItem, l.OnPlayerTouchedItemEvent)
 	l.onPlayerUsedItemEventId = eventSystem.AddObserver(PlayerUsedItem, l.OnPlayerUsedItemEvent)
 	l.onPlayerDestroyedItemEventId = eventSystem.AddObserver(PlayerDestroyedItem, l.OnPlayerDestroyedItemEvent)
+	l.onPlayerPumpedEventId = eventSystem.AddObserver(PlayerPumped, l.OnPlayerPumpedEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
 			return
@@ -104,6 +106,18 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	for i, maptile = range maptiles {
 		if maptile != nil {
 			itemId := ItemId(maptile.Index)
+			if name == "layer00.tmx" && itemId == Item4 {
+				items = append(items, NewItem(
+					ItemPump,
+					ItemIdToType[ItemPump],
+					"item",
+					(maptile.TileBounds.X+maptile.TileBounds.W)/PxPerUnit,
+					(maptile.TileBounds.Y+maptile.TileBounds.H)/PxPerUnit,
+					maptile.TileBounds.W/PxPerUnit,
+					maptile.TileBounds.H/PxPerUnit,
+				))
+				continue
+			}
 			items = append(items, NewItem(
 				itemId,
 				ItemIdToType[itemId],
@@ -173,12 +187,12 @@ func (l *Level) Delete() {
 	l.eventSystem.RemoveObserver(PlayerTouchedItem, l.onPlayerTouchedItemEventId)
 	l.eventSystem.RemoveObserver(PlayerDestroyedItem, l.onPlayerDestroyedItemEventId)
 	l.eventSystem.RemoveObserver(PlayerUsedItem, l.onPlayerUsedItemEventId)
+	l.eventSystem.RemoveObserver(PlayerPumped, l.onPlayerPumpedEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	if move, ok := e.(*PlayerMoveEvent); ok {
 		l.Player.UpdateDesiredMove(move.Dir, move.Inverse)
-		//		l.Player.DesiredMove = move.Dir
 	}
 }
 
@@ -199,8 +213,9 @@ func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 				l.LayerAdvance()
 			}
 		case UseableItem:
-			l.Player.MoveTo(touched.Item.Pos())
-			l.Player.CanMove = false
+			if l.Player.LastUsed != touched.Item {
+				l.Player.CanMove = false
+			}
 			l.eventSystem.Enqueue(NewPlayerUsedItemEvent(touched.Item))
 		case InventoryItem:
 			l.RemoveItem(touched.Item)
@@ -215,6 +230,7 @@ func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 
 func (l *Level) OnPlayerUsedItemEvent(e twodee.GETyper) {
 	if used, ok := e.(*PlayerUsedItemEvent); ok {
+		l.Player.LastUsed = used.Item
 		switch used.Item.Id {
 		case ItemPump:
 			l.Player.IsPumping = true
@@ -226,6 +242,10 @@ func (l *Level) OnPlayerDestroyedItemEvent(e twodee.GETyper) {
 	if destroyed, ok := e.(*PlayerDestroyedItemEvent); ok {
 		l.RemoveItem(destroyed.Item)
 	}
+}
+
+func (l *Level) OnPlayerPumpedEvent(e twodee.GETyper) {
+	l.Player.CanMove = true
 }
 
 // Removes the item from the current layer's Items slice.
@@ -273,21 +293,21 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 		ymin  = int32(a.Y * ratio)
 		ymax  = int32(b.Y * ratio)
 	)
-	// fmt.Printf("X %v-%v, Y %v-%v\n", xmin, xmax, ymin, ymax)
 	for x := xmin; x <= xmax; x++ {
 		for y := ymin; y <= ymax; y++ {
-			// fmt.Printf("Checking X %v Y %v\n", x, y)
 			if l.Grids[layer].Get(x, y) == true {
 				return true
 			}
 		}
 	}
-	playerBounds := l.Player.Bounds()
 	touchedItem := false
 	for _, item := range l.Items[layer] {
-		if playerBounds.Overlaps(item.Bounds()) {
+		if item.Bounds().IntersectedBy(a, b) {
 			l.eventSystem.Enqueue(NewPlayerTouchedItemEvent(item))
 			touchedItem = true
+			if item.Type == UseableItem {
+				return true
+			}
 			break
 		}
 	}
@@ -398,6 +418,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	var currentWaterStatus = l.GetLayerWaterStatus(l.Active)
 	l.WaterAccumulation += elapsed
 	if l.Player.IsPumping {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayerPumped))
 		l.WaterAccumulation -= 2 * elapsed
 		if l.WaterAccumulation < 0 {
 			l.WaterAccumulation = 0
@@ -416,6 +437,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	if l.Player.HealthPercent() == 0 {
 		l.eventSystem.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
 		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayGameOverEffect))
 	}
 }
