@@ -97,6 +97,12 @@ func (l *GameLayer) Render() {
 			fallthrough
 		case i == l.Level.Active-1:
 			y = l.Level.GetLayerY(i)
+			switch l.Level.GetLayerWaterStatus(i) {
+			case Dry:
+				l.Level.Geometry[i].SetTextureOffsetPx(0, 0)
+			case Wet:
+				l.Level.Geometry[i].SetTextureOffsetPx(0, -16)
+			}
 			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
 		}
 		if i == l.Level.Active {
