@@ -17,6 +17,8 @@ const (
 	Item3
 	Item4
 	ItemFinal
+	ItemPickaxe
+	ItemRock
 	item_sentinel
 )
 
@@ -28,13 +30,15 @@ const (
 )
 
 var ItemIdToType = map[ItemId]ItemType{
-	ItemDown:  LayerThresholdItem,
-	ItemUp:    LayerThresholdItem,
-	Item1:     InventoryItem,
-	Item2:     InventoryItem,
-	Item3:     InventoryItem,
-	Item4:     InventoryItem,
-	ItemFinal: InventoryItem,
+	ItemDown:    LayerThresholdItem,
+	ItemUp:      LayerThresholdItem,
+	Item1:       InventoryItem,
+	Item2:       InventoryItem,
+	Item3:       InventoryItem,
+	Item4:       InventoryItem,
+	ItemFinal:   InventoryItem,
+	ItemPickaxe: InventoryItem,
+	ItemRock:    DestructableItem,
 }
 
 const (
