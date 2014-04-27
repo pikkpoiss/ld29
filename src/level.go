@@ -26,10 +26,11 @@ type Level struct {
 	onPlayerDestroyedItemEventId int
 	onPlayerUsedItemEventId      int
 	WaterAccumulation            time.Duration
+	Paused                       bool
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(2, 2)
+	var player = NewPlayer(10, 5)
 	l = &Level{
 		Height:            0,
 		Grids:             []*twodee.Grid{},
@@ -41,6 +42,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 		Player:            player,
 		eventSystem:       eventSystem,
 		WaterAccumulation: 0,
+		Paused:            false,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
 	l.onPlayerTouchedItemEventId = eventSystem.AddObserver(PlayerTouchedItem, l.OnPlayerTouchedItemEvent)
@@ -372,6 +374,9 @@ func (l *Level) LayerRewind() {
 }
 
 func (l *Level) Update(elapsed time.Duration) {
+	if l.Paused {
+		return
+	}
 	var i int32
 	for i = 0; i < l.Layers; i++ {
 		if l.Transitions[i] != nil {
@@ -422,4 +427,12 @@ func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
 		return Wet
 	}
 	return Dry
+}
+
+func (l *Level) Pause() {
+	l.Paused = true
+}
+
+func (l *Level) Unpause() {
+	l.Paused = false
 }

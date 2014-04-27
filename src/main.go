@@ -22,6 +22,7 @@ type Application struct {
 	GameEventHandler      *twodee.GameEventHandler
 	gameClosingObserverId int
 	InitiateCloseGame     bool
+	overlayLayer          *OverlayLayer
 }
 
 func NewApplication() (app *Application, err error) {
@@ -65,11 +66,16 @@ func NewApplication() (app *Application, err error) {
 	if hudLayer, err = NewHudLayer(app, gameLayer); err != nil {
 		return
 	}
+	if app.overlayLayer, err = NewOverlayLayer(app, gameLayer); err != nil {
+		return
+	}
 	if err = gameLayer.LoadLevel("assets/level00/"); err != nil {
 		return
 	}
+	app.overlayLayer.Show(OverlayTitleFrame)
 	layers.Push(gameLayer)
 	layers.Push(hudLayer)
+	layers.Push(app.overlayLayer)
 	layers.Push(menuLayer)
 	app.gameClosingObserverId = app.GameEventHandler.AddObserver(GameIsClosing, app.CloseGame)
 	return
