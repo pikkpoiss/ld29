@@ -10,6 +10,8 @@ type AudioSystem struct {
 	dangerMusic              *twodee.Music
 	menuMoveEffect           *twodee.SoundEffect
 	menuSelectEffect         *twodee.SoundEffect
+	dryWalkEffect            *twodee.SoundEffect
+	wetWalkEffect            *twodee.SoundEffect
 	outdoorMusicObserverId   int
 	exploreMusicObserverId   int
 	warningMusicObserverId   int
@@ -19,6 +21,8 @@ type AudioSystem struct {
 	menuPauseMusicObserverId int
 	menuMoveObserverId       int
 	menuSelectObserverId     int
+	dryWalkObserverId        int
+	wetWalkObserverId        int
 	musicToggle              int32
 }
 
@@ -88,6 +92,14 @@ func (a *AudioSystem) PlayMenuSelectEffect(e twodee.GETyper) {
 	a.menuSelectEffect.Play(1)
 }
 
+func (a *AudioSystem) PlayDryWalkEffect(e twodee.GETyper) {
+	a.dryWalkEffect.Play(1)
+}
+
+func (a *AudioSystem) PlayWetWalkEffect(e twodee.GETyper) {
+	a.wetWalkEffect.Play(1)
+}
+
 func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(PlayOutdoorMusic, a.outdoorMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayExploreMusic, a.exploreMusicObserverId)
@@ -98,7 +110,16 @@ func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(MenuPauseMusic, a.menuPauseMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(MenuMove, a.menuMoveObserverId)
 	a.app.GameEventHandler.RemoveObserver(MenuSelect, a.menuSelectObserverId)
+	a.app.GameEventHandler.RemoveObserver(DryWalk, a.dryWalkObserverId)
+	a.app.GameEventHandler.RemoveObserver(WetWalk, a.wetWalkObserverId)
+	a.outdoorMusic.Delete()
 	a.exploreMusic.Delete()
+	a.warningMusic.Delete()
+	a.dangerMusic.Delete()
+	a.menuMoveEffect.Delete()
+	a.menuSelectEffect.Delete()
+	a.dryWalkEffect.Delete()
+	a.wetWalkEffect.Delete()
 }
 
 func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
@@ -109,6 +130,8 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		dangerMusic      *twodee.Music
 		menuMoveEffect   *twodee.SoundEffect
 		menuSelectEffect *twodee.SoundEffect
+		dryWalkEffect    *twodee.SoundEffect
+		wetWalkEffect    *twodee.SoundEffect
 	)
 	if outdoorMusic, err = twodee.NewMusic("assets/music/Outdoor_Theme.ogg"); err != nil {
 		return
@@ -128,6 +151,12 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	if menuSelectEffect, err = twodee.NewSoundEffect("assets/soundeffects/MenuSelect.ogg"); err != nil {
 		return
 	}
+	if dryWalkEffect, err = twodee.NewSoundEffect("assets/soundeffects/DryWalk.ogg"); err != nil {
+		return
+	}
+	if wetWalkEffect, err = twodee.NewSoundEffect("assets/soundeffects/WetWalk.ogg"); err != nil {
+		return
+	}
 	audioSystem = &AudioSystem{
 		app:              app,
 		outdoorMusic:     outdoorMusic,
@@ -136,6 +165,8 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		dangerMusic:      dangerMusic,
 		menuMoveEffect:   menuMoveEffect,
 		menuSelectEffect: menuSelectEffect,
+		dryWalkEffect:    dryWalkEffect,
+		wetWalkEffect:    wetWalkEffect,
 		musicToggle:      1,
 	}
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayOutdoorMusic, audioSystem.PlayOutdoorMusic)
@@ -147,5 +178,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.menuPauseMusicObserverId = app.GameEventHandler.AddObserver(MenuPauseMusic, audioSystem.MenuPauseMusic)
 	audioSystem.menuMoveObserverId = app.GameEventHandler.AddObserver(MenuMove, audioSystem.PlayMenuMoveEffect)
 	audioSystem.menuSelectObserverId = app.GameEventHandler.AddObserver(MenuSelect, audioSystem.PlayMenuSelectEffect)
+	audioSystem.dryWalkObserverId = app.GameEventHandler.AddObserver(DryWalk, audioSystem.PlayDryWalkEffect)
+	audioSystem.wetWalkObserverId = app.GameEventHandler.AddObserver(WetWalk, audioSystem.PlayWetWalkEffect)
 	return
 }

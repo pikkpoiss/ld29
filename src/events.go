@@ -24,6 +24,8 @@ const (
 	PlayerTouchedItem
 	PlayerUsedItem
 	PlayerDestroyedItem
+	DryWalk
+	WetWalk
 	sentinel
 )
 

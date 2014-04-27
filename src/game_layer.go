@@ -149,6 +149,7 @@ func (l *GameLayer) Reset() (err error) {
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	var released bool
+	var layerWaterStatus = l.Level.GetLayerWaterStatus(l.Level.Active)
 	switch event := evt.(type) {
 	case *twodee.KeyEvent:
 		released = event.Type == twodee.Release
@@ -158,24 +159,52 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(North))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
+				if l.Level.Active != 0 {
+					if layerWaterStatus == 0 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(DryWalk))
+					} else if layerWaterStatus == 1 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(WetWalk))
+					}
+				}
 			}
 		case twodee.KeyRight:
 			if released {
 				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(East))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
+				if l.Level.Active != 0 {
+					if layerWaterStatus == 0 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(DryWalk))
+					} else if layerWaterStatus == 1 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(WetWalk))
+					}
+				}
 			}
 		case twodee.KeyDown:
 			if released {
 				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(South))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
+				if l.Level.Active != 0 {
+					if layerWaterStatus == 0 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(DryWalk))
+					} else if layerWaterStatus == 1 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(WetWalk))
+					}
+				}
 			}
 		case twodee.KeyLeft:
 			if released {
 				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(West))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
+				if l.Level.Active != 0 {
+					if layerWaterStatus == 0 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(DryWalk))
+					} else if layerWaterStatus == 1 {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(WetWalk))
+					}
+				}
 			}
 		case twodee.KeyJ:
 			if released {
