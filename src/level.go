@@ -324,7 +324,6 @@ func (l *Level) LayerAdvance() {
 	if l.Active >= l.Layers-1 {
 		return
 	}
-	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayFallDownEffect))
 	var newWaterLevel = l.GetLayerWaterStatus(l.Active + 1)
 	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
 	if l.Active == 0 {
@@ -348,6 +347,7 @@ func (l *Level) LayerAdvance() {
 	})
 	l.Active++
 	l.Transitions[l.Active] = NewLinearTween(-1, 0, BotSlideSpeed)
+	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayFallDownEffect))
 }
 
 func (l *Level) LayerRewind() {
