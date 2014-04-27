@@ -28,7 +28,7 @@ Theme: "Beneath the surface"
   * [ ] End state
   * [x] Destructable item framework.
   * [ ] Pickaxe and barrier tiles.
-  * [ ] Pump item type and pump events.
+  * [x] Pump item type and pump events.
   * [ ] Pump tile.
 
 ## Brainstorming

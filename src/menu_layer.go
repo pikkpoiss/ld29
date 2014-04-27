@@ -47,6 +47,11 @@ func NewMenuLayer(window twodee.Rectangle, App *Application) (layer *MenuLayer, 
 		return
 	}
 	menu, err = twodee.NewMenu([]twodee.MenuItem{
+		//twodee.NewParentMenuItem("Music", []twodee.MenuItem{
+		//	twodee.NewBackMenuItem(".."),
+		//	twodee.NewBoundValueMenuItem("On", 1, &App.AudioSystem.musicToggle),
+		//	twodee.NewBoundValueMenuItem("Off", 0, &App.AudioSystem.musicToggle),
+		//}),
 		twodee.NewKeyValueMenuItem("Music On/Off", ProgramCode, MusicCode),
 		twodee.NewKeyValueMenuItem("Exit", ProgramCode, ExitCode),
 	})
@@ -208,9 +213,11 @@ func (l *MenuLayer) handleMenuItem(data *twodee.MenuItemData) {
 		switch data.Value {
 		case MusicCode:
 			if twodee.MusicIsPaused() {
-				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
+				l.App.AudioSystem.musicToggle = 1
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuResumeMusic))
 			} else {
-				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+				l.App.AudioSystem.musicToggle = 0
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuPauseMusic))
 			}
 		case ExitCode:
 			l.App.InitiateCloseGame = true
