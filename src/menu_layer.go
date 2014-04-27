@@ -143,6 +143,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			if event.Code == twodee.KeyEscape {
 				l.menu.Reset()
 				l.visible = true
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuSelect))
 			}
 		}
 		return true
