@@ -17,6 +17,7 @@ const (
 	Item3
 	Item4
 	ItemFinal
+	ItemPump
 	ItemPickaxe
 	ItemRock
 	item_sentinel
@@ -26,6 +27,7 @@ const (
 const (
 	LayerThresholdItem ItemType = iota
 	InventoryItem
+	UseableItem
 	DestructableItem
 )
 
@@ -37,6 +39,7 @@ var ItemIdToType = map[ItemId]ItemType{
 	Item3:       InventoryItem,
 	Item4:       InventoryItem,
 	ItemFinal:   InventoryItem,
+	ItemPump:    UseableItem,
 	ItemPickaxe: InventoryItem,
 	ItemRock:    DestructableItem,
 }

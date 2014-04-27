@@ -24,6 +24,7 @@ type Level struct {
 	onPlayerMoveEventId          int
 	onPlayerTouchedItemEventId   int
 	onPlayerDestroyedItemEventId int
+	onPlayerUsedItemEventId      int
 	WaterAccumulation            time.Duration
 }
 
@@ -43,6 +44,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
 	l.onPlayerTouchedItemEventId = eventSystem.AddObserver(PlayerTouchedItem, l.OnPlayerTouchedItemEvent)
+	l.onPlayerUsedItemEventId = eventSystem.AddObserver(PlayerUsedItem, l.OnPlayerUsedItemEvent)
 	l.onPlayerDestroyedItemEventId = eventSystem.AddObserver(PlayerDestroyedItem, l.OnPlayerDestroyedItemEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
@@ -167,6 +169,7 @@ func (l *Level) Delete() {
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
 	l.eventSystem.RemoveObserver(PlayerTouchedItem, l.onPlayerTouchedItemEventId)
 	l.eventSystem.RemoveObserver(PlayerDestroyedItem, l.onPlayerDestroyedItemEventId)
+	l.eventSystem.RemoveObserver(PlayerUsedItem, l.onPlayerUsedItemEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
@@ -192,6 +195,10 @@ func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 			case ItemDown:
 				l.LayerAdvance()
 			}
+		case UseableItem:
+			l.Player.MoveTo(touched.Item.Pos())
+			l.Player.CanMove = false
+			l.eventSystem.Enqueue(NewPlayerUsedItemEvent(touched.Item))
 		case InventoryItem:
 			l.RemoveItem(touched.Item)
 			l.Player.AddToInventory(touched.Item)
@@ -199,6 +206,16 @@ func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 			if l.Player.CanDestroy(touched.Item) {
 				l.eventSystem.Enqueue(NewPlayerDestroyedItemEvent(touched.Item))
 			}
+		}
+	}
+}
+
+func (l *Level) OnPlayerUsedItemEvent(e twodee.GETyper) {
+	if used, ok := e.(*PlayerUsedItemEvent); ok {
+		switch used.Item.Id {
+		case ItemPump:
+			// TODO: lower the water level by some dy.
+			fmt.Println("usin' the pump!")
 		}
 	}
 }
