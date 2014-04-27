@@ -10,8 +10,6 @@ type AudioSystem struct {
 	dangerMusic              *twodee.Music
 	menuMoveEffect           *twodee.SoundEffect
 	menuSelectEffect         *twodee.SoundEffect
-	dryWalkEffect            *twodee.SoundEffect
-	wetWalkEffect            *twodee.SoundEffect
 	fallDownEffect           *twodee.SoundEffect
 	climbUpEffect            *twodee.SoundEffect
 	pickupItemEffect         *twodee.SoundEffect
@@ -100,14 +98,6 @@ func (a *AudioSystem) PlayMenuSelectEffect(e twodee.GETyper) {
 	a.menuSelectEffect.Play(1)
 }
 
-func (a *AudioSystem) PlayDryWalkEffect(e twodee.GETyper) {
-	a.dryWalkEffect.PlayChannel(4, 1)
-}
-
-func (a *AudioSystem) PlayWetWalkEffect(e twodee.GETyper) {
-	a.wetWalkEffect.PlayChannel(4, 1)
-}
-
 func (a *AudioSystem) PlayFallDownEffect(e twodee.GETyper) {
 	a.fallDownEffect.PlayChannel(5, 1)
 }
@@ -134,8 +124,6 @@ func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(MenuPauseMusic, a.menuPauseMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(MenuMove, a.menuMoveObserverId)
 	a.app.GameEventHandler.RemoveObserver(MenuSelect, a.menuSelectObserverId)
-	a.app.GameEventHandler.RemoveObserver(DryWalk, a.dryWalkObserverId)
-	a.app.GameEventHandler.RemoveObserver(WetWalk, a.wetWalkObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayFallDownEffect, a.fallDownObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayClimbUpEffect, a.climbUpObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayPickupItemEffect, a.pickupItemObserverId)
@@ -146,8 +134,6 @@ func (a *AudioSystem) Delete() {
 	a.dangerMusic.Delete()
 	a.menuMoveEffect.Delete()
 	a.menuSelectEffect.Delete()
-	a.dryWalkEffect.Delete()
-	a.wetWalkEffect.Delete()
 	a.fallDownEffect.Delete()
 	a.climbUpEffect.Delete()
 	a.pickupItemEffect.Delete()
@@ -162,8 +148,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		dangerMusic      *twodee.Music
 		menuMoveEffect   *twodee.SoundEffect
 		menuSelectEffect *twodee.SoundEffect
-		dryWalkEffect    *twodee.SoundEffect
-		wetWalkEffect    *twodee.SoundEffect
 		fallDownEffect   *twodee.SoundEffect
 		climbUpEffect    *twodee.SoundEffect
 		pickupItemEffect *twodee.SoundEffect
@@ -187,12 +171,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	if menuSelectEffect, err = twodee.NewSoundEffect("assets/soundeffects/MenuSelect.ogg"); err != nil {
 		return
 	}
-	if dryWalkEffect, err = twodee.NewSoundEffect("assets/soundeffects/DryWalk.ogg"); err != nil {
-		return
-	}
-	if wetWalkEffect, err = twodee.NewSoundEffect("assets/soundeffects/WetWalk.ogg"); err != nil {
-		return
-	}
 	if fallDownEffect, err = twodee.NewSoundEffect("assets/soundeffects/FallDown.ogg"); err != nil {
 		return
 	}
@@ -213,8 +191,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		dangerMusic:      dangerMusic,
 		menuMoveEffect:   menuMoveEffect,
 		menuSelectEffect: menuSelectEffect,
-		dryWalkEffect:    dryWalkEffect,
-		wetWalkEffect:    wetWalkEffect,
 		fallDownEffect:   fallDownEffect,
 		climbUpEffect:    climbUpEffect,
 		pickupItemEffect: pickupItemEffect,
@@ -230,8 +206,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.menuPauseMusicObserverId = app.GameEventHandler.AddObserver(MenuPauseMusic, audioSystem.MenuPauseMusic)
 	audioSystem.menuMoveObserverId = app.GameEventHandler.AddObserver(MenuMove, audioSystem.PlayMenuMoveEffect)
 	audioSystem.menuSelectObserverId = app.GameEventHandler.AddObserver(MenuSelect, audioSystem.PlayMenuSelectEffect)
-	audioSystem.dryWalkObserverId = app.GameEventHandler.AddObserver(DryWalk, audioSystem.PlayDryWalkEffect)
-	audioSystem.wetWalkObserverId = app.GameEventHandler.AddObserver(WetWalk, audioSystem.PlayWetWalkEffect)
 	audioSystem.fallDownObserverId = app.GameEventHandler.AddObserver(PlayFallDownEffect, audioSystem.PlayFallDownEffect)
 	audioSystem.climbUpObserverId = app.GameEventHandler.AddObserver(PlayClimbUpEffect, audioSystem.PlayClimbUpEffect)
 	audioSystem.pickupItemObserverId = app.GameEventHandler.AddObserver(PlayPickupItemEffect, audioSystem.PlayPickupItemEffect)
