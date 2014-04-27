@@ -24,6 +24,7 @@ const (
 const (
 	LayerThresholdItem ItemType = iota
 	InventoryItem
+	DestructableItem
 )
 
 var ItemIdToType = map[ItemId]ItemType{
