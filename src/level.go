@@ -115,6 +115,7 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
 		return
 	}
+	//batch.SetTextureOffsetPx(0, 16)
 	ratio = float32(grid.Width) * PxPerUnit / float32(m.TileWidth*m.Width)
 	height = float32(grid.Height) / ratio
 	if l.Height < height {
