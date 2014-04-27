@@ -388,6 +388,9 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.WaterAccumulation += elapsed
 	if l.Player.IsPumping {
 		l.WaterAccumulation -= 2 * elapsed
+		if l.WaterAccumulation < 0 {
+			l.WaterAccumulation = 0
+		}
 	}
 	var newWaterStatus = l.GetLayerWaterStatus(l.Active)
 	if l.Active != 0 && (newWaterStatus > currentWaterStatus) {
