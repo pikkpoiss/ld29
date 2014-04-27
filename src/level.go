@@ -106,18 +106,6 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	for i, maptile = range maptiles {
 		if maptile != nil {
 			itemId := ItemId(maptile.Index)
-			if name == "layer00.tmx" && itemId == Item4 {
-				items = append(items, NewItem(
-					ItemPump,
-					ItemIdToType[ItemPump],
-					"item",
-					(maptile.TileBounds.X+maptile.TileBounds.W)/PxPerUnit,
-					(maptile.TileBounds.Y+maptile.TileBounds.H)/PxPerUnit,
-					maptile.TileBounds.W/PxPerUnit,
-					maptile.TileBounds.H/PxPerUnit,
-				))
-				continue
-			}
 			items = append(items, NewItem(
 				itemId,
 				ItemIdToType[itemId],
