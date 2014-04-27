@@ -120,5 +120,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayDangerMusic, audioSystem.PlayDangerMusic)
 	audioSystem.pauseMusicObserverId = app.GameEventHandler.AddObserver(PauseMusic, audioSystem.PauseMusic)
 	audioSystem.resumeMusicObserverId = app.GameEventHandler.AddObserver(ResumeMusic, audioSystem.ResumeMusic)
+	audioSystem.menuPauseMusicObserverId = app.GameEventHandler.AddObserver(MenuPauseMusic, audioSystem.MenuPauseMusic)
 	return
 }
