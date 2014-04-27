@@ -18,6 +18,7 @@ const (
 	PauseMusic
 	ResumeMusic
 	PlayerTouchedItem
+	PlayerUsedItem
 	PlayerDestroyedItem
 	sentinel
 )
@@ -68,6 +69,19 @@ type PlayerTouchedItemEvent struct {
 func NewPlayerTouchedItemEvent(i *Item) (e *PlayerTouchedItemEvent) {
 	e = &PlayerTouchedItemEvent{
 		twodee.NewBasicGameEvent(PlayerTouchedItem),
+		i,
+	}
+	return
+}
+
+type PlayerUsedItemEvent struct {
+	*twodee.BasicGameEvent
+	Item *Item
+}
+
+func NewPlayerUsedItemEvent(i *Item) (e *PlayerUsedItemEvent) {
+	e = &PlayerUsedItemEvent{
+		twodee.NewBasicGameEvent(PlayerUsedItem),
 		i,
 	}
 	return
