@@ -191,7 +191,6 @@ func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 			l.Player.CanMove = false
 			switch touched.Item.Id {
 			case ItemUp:
-				l.Player.IsPumping = true
 				l.LayerRewind()
 			case ItemDown:
 				l.LayerAdvance()
