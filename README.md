@@ -26,7 +26,8 @@ Theme: "Beneath the surface"
   * [x] Triggers for running over items and transition tiles.
   * [ ] Sound effects
   * [ ] End state
-  * [ ] Pickaxe and barriers.
+  * [x] Destructable item framework.
+  * [ ] Pickaxe and barrier tiles.
 
 ## Brainstorming
 
