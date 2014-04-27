@@ -82,27 +82,39 @@ func (l *OverlayLayer) HandleEvent(evt twodee.Event) bool {
 		}
 		switch event.Code {
 		case twodee.KeyUp:
-			fallthrough
+			if l.Frame == OverlayTitleFrame {
+				return l.Advance()
+			}
 		case twodee.KeyDown:
-			fallthrough
+			if l.Frame == OverlayTitleFrame {
+				return l.Advance()
+			}
 		case twodee.KeyLeft:
-			fallthrough
+			if l.Frame == OverlayTitleFrame {
+				return l.Advance()
+			}
 		case twodee.KeyRight:
-			fallthrough
+			if l.Frame == OverlayTitleFrame {
+				return l.Advance()
+			}
 		case twodee.KeyEscape:
 			fallthrough
 		case twodee.KeySpace:
 			fallthrough
 		case twodee.KeyEnter:
-			l.Game.Level.Unpause()
-			l.Showing = false
-			if l.Frame == OverlayDeathFrame || l.Frame == OverlayWinFrame {
-				l.Events.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
-			}
-			return false
+			return l.Advance()
 		}
 	}
 	return true
+}
+
+func (l *OverlayLayer) Advance() bool {
+	l.Game.Level.Unpause()
+	l.Showing = false
+	if l.Frame == OverlayDeathFrame || l.Frame == OverlayWinFrame {
+		l.Events.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
+	}
+	return false
 }
 
 func (l *OverlayLayer) Update(elapsed time.Duration) {
