@@ -309,12 +309,12 @@ func (l *Level) Update(elapsed time.Duration) {
 }
 
 func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
-	var percentFlooded = (int32)(l.WaterAccumulation / LevelWaterThreshold)
+	var percentFlooded = float32(l.WaterAccumulation) / float32(LevelWaterThreshold)
 	if percentFlooded >= 1 {
 		return Flooded
 	}
-	var layerLevelBottom = (l.Layers - layer) / l.Layers
-	var layerLevelTop = ((l.Layers - layer) + 1) / l.Layers
+	var layerLevelBottom = 1 - float32(layer)/float32(l.Layers)
+	var layerLevelTop = layerLevelBottom + (1.00 / float32(l.Layers))
 	if percentFlooded >= layerLevelTop {
 		return Flooded
 	} else if percentFlooded >= layerLevelBottom {
