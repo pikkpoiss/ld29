@@ -416,6 +416,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	if l.Player.HealthPercent() == 0 {
 		l.eventSystem.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
 		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayGameOverEffect))
 	}
 }
