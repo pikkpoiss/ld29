@@ -337,9 +337,10 @@ func (l *Level) LayerAdvance() {
 		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
 	}
 	l.Transitions[l.Active] = NewLinearTween(0, l.Height, TopSlideSpeed)
-	l.Player.SetState(Standing | Down)
-	l.Transitions[l.Active].SetCallback(func() {
+	l.Player.SetState(ClimbDown | Down)
+	l.Player.SetCallback(func() {
 		l.Player.CanMove = true
+		l.Player.SetState(Standing | Down)
 	})
 	l.Active++
 	l.Transitions[l.Active] = NewLinearTween(-1, 0, BotSlideSpeed)

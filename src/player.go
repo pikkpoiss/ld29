@@ -90,6 +90,7 @@ const (
 	Up
 	Down
 	ClimbUp
+	ClimbDown
 )
 
 var PlayerAnimations = map[EntityState][]int{
@@ -102,6 +103,7 @@ var PlayerAnimations = map[EntityState][]int{
 	Walking | Left:   []int{17, 18, 19, 20, 21, 22},
 	Walking | Right:  []int{17, 18, 19, 20, 21, 22},
 	ClimbUp | Down:   []int{32, 33, 34, 35, 36, 37, 38, 8},
+	ClimbDown | Down: []int{48, 49, 50, 51, 52, 53, 54, 8},
 }
 
 func NewPlayer(x, y float32) (player *Player) {
