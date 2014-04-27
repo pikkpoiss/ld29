@@ -287,6 +287,21 @@ func (l *Level) LayerAdvance() {
 	if l.Active >= l.Layers-1 {
 		return
 	}
+	var newWaterLevel = l.GetLayerWaterStatus(l.Active + 1)
+	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
+	if l.Active == 0 {
+		if newWaterLevel == 0 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
+		} else if newWaterLevel == 1 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+		} else if newWaterLevel == 2 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+		}
+	} else if newWaterLevel == 1 && previousWaterLevel == 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+	} else if newWaterLevel == 2 && previousWaterLevel != 2 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+	}
 	l.Transitions[l.Active] = NewLinearTween(0, l.Height, TopSlideSpeed)
 	l.Player.SetState(Standing | Down)
 	l.Transitions[l.Active].SetCallback(func() {
@@ -299,6 +314,15 @@ func (l *Level) LayerAdvance() {
 func (l *Level) LayerRewind() {
 	if l.Active <= 0 {
 		return
+	}
+	var newWaterLevel = l.GetLayerWaterStatus(l.Active - 1)
+	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
+	if l.Active == 1 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayOutdoorMusic))
+	} else if newWaterLevel == 0 && previousWaterLevel != 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
+	} else if newWaterLevel == 1 && previousWaterLevel != 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
 	}
 	l.Transitions[l.Active-1] = NewLinearTween(l.Height, 0, TopSlideSpeed)
 	l.Transitions[l.Active-1].SetCallback(func() {
