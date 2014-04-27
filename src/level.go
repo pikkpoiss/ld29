@@ -11,19 +11,19 @@ import (
 )
 
 type Level struct {
-	Height                      float32
-	Grids                       []*twodee.Grid
-	Items                       [][]*Item
-	Geometry                    []*twodee.Batch
-	GridRatios                  []float32
-	Layers                      int32
-	Player                      *Player
-	Active                      int32
-	Transitions                 []*LinearTween
-	eventSystem                 *twodee.GameEventHandler
-	onPlayerMoveEventId         int
-	onPlayerPickedUpItemEventId int
-	WaterAccumulation           time.Duration
+	Height                     float32
+	Grids                      []*twodee.Grid
+	Items                      [][]*Item
+	Geometry                   []*twodee.Batch
+	GridRatios                 []float32
+	Layers                     int32
+	Player                     *Player
+	Active                     int32
+	Transitions                []*LinearTween
+	eventSystem                *twodee.GameEventHandler
+	onPlayerMoveEventId        int
+	onPlayerTouchedItemEventId int
+	WaterAccumulation          time.Duration
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
@@ -41,7 +41,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 		WaterAccumulation: 0,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
-	l.onPlayerPickedUpItemEventId = eventSystem.AddObserver(PlayerPickedUpItem, l.OnPlayerPickedUpItemEvent)
+	l.onPlayerTouchedItemEventId = eventSystem.AddObserver(PlayerTouchedItem, l.OnPlayerTouchedItemEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
 			return
@@ -163,7 +163,7 @@ func (l *Level) Delete() {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
-	l.eventSystem.RemoveObserver(PlayerPickedUpItem, l.onPlayerPickedUpItemEventId)
+	l.eventSystem.RemoveObserver(PlayerTouchedItem, l.onPlayerTouchedItemEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
@@ -173,11 +173,11 @@ func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	}
 }
 
-func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
+func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 	if !l.Player.CanGetItem {
 		return
 	}
-	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
+	if pickup, ok := e.(*PlayerTouchedItemEvent); ok {
 		l.Player.CanGetItem = false
 		switch pickup.Item.Type {
 		case LayerThresholdItem:
@@ -254,7 +254,7 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 	touchedItem := false
 	for _, item := range l.Items[layer] {
 		if playerBounds.Overlaps(item.Bounds()) {
-			l.eventSystem.Enqueue(NewPlayerPickedUpItemEvent(item))
+			l.eventSystem.Enqueue(NewPlayerTouchedItemEvent(item))
 			touchedItem = true
 			break
 		}
