@@ -34,13 +34,24 @@ const (
 
 type PlayerMoveEvent struct {
 	*twodee.BasicGameEvent
-	Dir MoveDirection
+	Dir     MoveDirection
+	Inverse bool
 }
 
 func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
 		twodee.NewBasicGameEvent(PlayerMove),
 		direction,
+		false,
+	}
+	return
+}
+
+func NewInversePlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
+	e = &PlayerMoveEvent{
+		twodee.NewBasicGameEvent(PlayerMove),
+		direction,
+		true,
 	}
 	return
 }

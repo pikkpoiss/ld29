@@ -25,7 +25,7 @@ type Level struct {
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(1,1)
+	var player = NewPlayer(1, 1)
 	l = &Level{
 		Height:      0,
 		Grids:       []*twodee.Grid{},
@@ -134,7 +134,8 @@ func (l *Level) Delete() {
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	if move, ok := e.(*PlayerMoveEvent); ok {
-		l.Player.DesiredMove = move.Dir
+		l.Player.UpdateDesiredMove(move.Dir, move.Inverse)
+		//		l.Player.DesiredMove = move.Dir
 	}
 }
 
