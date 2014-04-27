@@ -6,7 +6,6 @@ import (
 )
 
 type OverlayLayer struct {
-
 	Game              *GameLayer
 	Events            *twodee.GameEventHandler
 	TileRenderer      *twodee.TileRenderer
@@ -20,6 +19,7 @@ const (
 	OverlayTitleFrame = 0
 	OverlayDeathFrame = 1
 	OverlayWinFrame   = 2
+	OverlayWaterFrame = 3
 )
 
 func NewOverlayLayer(app *Application, game *GameLayer) (layer *OverlayLayer, err error) {

@@ -32,15 +32,16 @@ type Level struct {
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
 	var player = NewPlayer(10, 5)
 	l = &Level{
-		Height:            0,
-		Grids:             []*twodee.Grid{},
-		Items:             [][]*Item{},
-		Geometry:          []*twodee.Batch{},
-		GridRatios:        []float32{},
-		Layers:            0,
-		Active:            0,
-		Player:            player,
-		eventSystem:       eventSystem,
+		Height:      0,
+		Grids:       []*twodee.Grid{},
+		Items:       [][]*Item{},
+		Geometry:    []*twodee.Batch{},
+		GridRatios:  []float32{},
+		Layers:      0,
+		Active:      0,
+		Player:      player,
+		eventSystem: eventSystem,
+		//WaterAccumulation: LevelWaterThreshold,
 		WaterAccumulation: 0,
 		Paused:            false,
 	}

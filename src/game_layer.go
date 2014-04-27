@@ -21,6 +21,18 @@ func NewRain() *twodee.AnimatingEntity {
 	)
 }
 
+func NewWater() *twodee.AnimatingEntity {
+	return twodee.NewAnimatingEntity(
+		0, 0,
+		32.0/PxPerUnit, 32.0/PxPerUnit,
+		0,
+		twodee.Step10Hz,
+		[]int{
+			72, 73, 74, 75,
+		},
+	)
+}
+
 type GameLayer struct {
 	Level                     *Level
 	BatchRenderer             *twodee.BatchRenderer
@@ -29,6 +41,7 @@ type GameLayer struct {
 	App                       *Application
 	menuResumeMusicObserverId int
 	Rain                      *twodee.AnimatingEntity
+	Water                     *twodee.AnimatingEntity
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
@@ -36,6 +49,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 		App:    app,
 		Bounds: twodee.Rect(0, 0, 20, 20),
 		Rain:   NewRain(),
+		Water:  NewWater(),
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
@@ -94,6 +108,7 @@ func (l *GameLayer) Render() {
 	var i int32
 	var y float32
 	for i = l.Level.Layers - 1; i >= 0; i-- {
+		var waterStatus = l.Level.GetLayerWaterStatus(i)
 		switch {
 		case i == l.Level.Active:
 			fallthrough
@@ -101,7 +116,7 @@ func (l *GameLayer) Render() {
 			fallthrough
 		case i == l.Level.Active-1:
 			y = l.Level.GetLayerY(i)
-			switch l.Level.GetLayerWaterStatus(i) {
+			switch waterStatus {
 			case Dry:
 				l.Level.Geometry[i].SetTextureOffsetPx(0, 0)
 			case Wet:
@@ -120,17 +135,11 @@ func (l *GameLayer) Render() {
 
 			pt := l.Level.Player.Pos()
 			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
-
 			if i == 0 {
-				var j = 0
-				for x := 0; x < 10; x++ {
-					for y := 0; y < 10; y++ {
-						l.TileRenderer.Draw(l.Rain.OffsetFrame(j), float32(2*x)+1, float32(2*y)+1, 0, false, false)
-						j += 3
-					}
-				}
+				l.DrawOverlay(l.Rain)
+			} else if waterStatus == Flooded {
+				l.DrawOverlay(l.Water)
 			}
-
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}
@@ -139,9 +148,20 @@ func (l *GameLayer) Render() {
 	return
 }
 
+func (l *GameLayer) DrawOverlay(entity *twodee.AnimatingEntity) {
+	var j = 0
+	for x := 0; x < 10; x++ {
+		for y := 0; y < 10; y++ {
+			l.TileRenderer.Draw(entity.OffsetFrame(j), float32(2*x)+1, float32(2*y)+1, 0, false, false)
+			j += 3
+		}
+	}
+}
+
 func (l *GameLayer) Update(elapsed time.Duration) {
 	l.Level.Update(elapsed)
 	l.Rain.Update(elapsed)
+	l.Water.Update(elapsed)
 }
 
 func (l *GameLayer) Reset() (err error) {
