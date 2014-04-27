@@ -33,6 +33,10 @@ func NewWater() *twodee.AnimatingEntity {
 	)
 }
 
+const (
+	WaterEntityOffset = 80
+)
+
 type GameLayer struct {
 	Level                     *Level
 	BatchRenderer             *twodee.BatchRenderer
@@ -121,6 +125,8 @@ func (l *GameLayer) Render() {
 				l.Level.Geometry[i].SetTextureOffsetPx(0, 0)
 			case Wet:
 				l.Level.Geometry[i].SetTextureOffsetPx(0, -16)
+			case Flooded:
+				l.Level.Geometry[i].SetTextureOffsetPx(0, 0)
 			}
 			l.BatchRenderer.Draw(l.Level.Geometry[i], 0, y, 0)
 		}
@@ -130,11 +136,19 @@ func (l *GameLayer) Render() {
 
 			for _, item := range l.Level.Items[i] {
 				pt := item.Pos()
-				l.TileRenderer.Draw(item.Frame(), pt.X, pt.Y+y, 0, false, false)
+				frame := item.Frame()
+				if waterStatus == Wet && i != 0 {
+					frame += WaterEntityOffset
+				}
+				l.TileRenderer.Draw(frame, pt.X, pt.Y+y, 0, false, false)
 			}
 
 			pt := l.Level.Player.Pos()
-			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
+			frame := l.Level.Player.Frame()
+			if waterStatus == Wet && i != 0 {
+				frame += WaterEntityOffset
+			}
+			l.TileRenderer.Draw(frame, pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
 			if i == 0 {
 				l.DrawOverlay(l.Rain)
 			} else if waterStatus == Flooded {
