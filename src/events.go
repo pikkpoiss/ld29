@@ -17,6 +17,8 @@ const (
 	PlayDangerMusic
 	PauseMusic
 	ResumeMusic
+	MenuPauseMusic
+	MenuResumeMusic
 	PlayerTouchedItem
 	PlayerUsedItem
 	PlayerDestroyedItem
