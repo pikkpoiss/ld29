@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"../libs/twodee"
-)
+import "../libs/twodee"
 
 type DirectionsHistoryEntry struct {
 	prev, next *DirectionsHistoryEntry
@@ -18,7 +14,6 @@ type DirectionsHistory struct {
 
 // Adds a MoveDirection to the history if it's not already present.
 func (dh *DirectionsHistory) Add(d MoveDirection) {
-	fmt.Printf("Adding move direction: %v\n", d)
 	entry := dh.directions[d]
 	if entry.prev == nil && entry.next == nil && entry != dh.tail {
 		if dh.tail != nil {
@@ -31,7 +26,6 @@ func (dh *DirectionsHistory) Add(d MoveDirection) {
 
 // Removes a particular MoveDirection from the history chain; sets its prev and next fields to nil. Resets dh's tail if necessary.
 func (dh *DirectionsHistory) Remove(d MoveDirection) {
-	fmt.Printf("Trying to remove direction: %v\n", d)
 	entry := dh.directions[d]
 	if entry.prev != nil {
 		entry.prev.next = entry.next
