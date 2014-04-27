@@ -87,8 +87,8 @@ func (l *Level) loadLayer(path, name string) (err error) {
 			items = append(items, NewItem(
 				ItemType(maptile.Index),
 				"item",
-				(maptile.TileBounds.X + maptile.TileBounds.W)/PxPerUnit,
-				(maptile.TileBounds.Y + maptile.TileBounds.H)/PxPerUnit,
+				(maptile.TileBounds.X+maptile.TileBounds.W)/PxPerUnit,
+				(maptile.TileBounds.Y+maptile.TileBounds.H)/PxPerUnit,
 				maptile.TileBounds.W/PxPerUnit,
 				maptile.TileBounds.H/PxPerUnit,
 			))
@@ -158,8 +158,19 @@ func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 }
 
 func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
+	if !l.Player.CanGetItem {
+		return
+	}
 	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
-		l.Player.AddToInventory(pickup.Item)
+		l.Player.CanGetItem = false
+		switch pickup.Item.Id {
+		case ItemUp:
+			l.LayerRewind()
+		case ItemDown:
+			l.LayerAdvance()
+		default:
+			l.Player.AddToInventory(pickup.Item)
+		}
 	}
 }
 
@@ -199,11 +210,18 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 		}
 	}
 	playerBounds := l.Player.Bounds()
+	touchedItem := false
 	for _, item := range l.Items[layer] {
 		if playerBounds.Overlaps(item.Bounds()) {
 			l.eventSystem.Enqueue(NewPlayerPickedUpItemEvent(item))
+			touchedItem = true
 			break
 		}
+	}
+	if !touchedItem {
+		// Prevent the player from triggering another item
+		// pickup until they've moved off of all items
+		l.Player.CanGetItem = true
 	}
 	return false
 }
