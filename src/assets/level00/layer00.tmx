@@ -6,24 +6,24 @@
  <tileset firstgid="257" name="entities.fw" tilewidth="32" tileheight="32">
   <image source="../entities.fw.png" width="256" height="256"/>
  </tileset>
- <layer name="raw" width="20" height="20">
+ <layer name="raw" width="20" height="20" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjZmBgYB7kmIlKeNS8UfMGm3mUpHt6mDfYw49Yv2PTR2/zBkv4URMDAF75A50=
   </data>
  </layer>
- <layer name="tiles" width="20" height="20" opacity="0.63">
+ <layer name="tiles" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJwzYGBgMKAy1qESBpmlB8RCVMIao+aNmjfIzFMHYm0sWJdM81QYsOclrUHiX1qahysscYUnIfNwhSWu8BwK4WeAJ4xIxSCzAAYWKL4=
+   eJwTZ2BgEB/Fo3gUj+JRPIpJxACisCPx
   </data>
  </layer>
- <layer name="collision" width="20" height="20" visible="0">
+ <layer name="collision" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjZGBgYBzkmFpg1LxR8wabeZSke3qYRwmgt3mkliP0No9UQCvzqIkBlCMAfQ==
+   eJxjZGBgYKQyphYYNW/UvFHzRs0bNY+65lETAwD0WABN
   </data>
  </layer>
  <layer name="entities" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUUAKYGQfaBaNguACmIZaWABQ+AAg=
+   eJxjYBgFo2AUUAKYGAfaBaNgFAwMAAAPMwAE
   </data>
  </layer>
 </map>
