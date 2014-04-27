@@ -3,20 +3,19 @@ package main
 import twodee "../libs/twodee"
 
 type AudioSystem struct {
-	app                       *Application
-	outdoorMusic              *twodee.Music
-	exploreMusic              *twodee.Music
-	warningMusic              *twodee.Music
-	dangerMusic               *twodee.Music
-	outdoorMusicObserverId    int
-	exploreMusicObserverId    int
-	warningMusicObserverId    int
-	dangerMusicObserverId     int
-	pauseMusicObserverId      int
-	resumeMusicObserverId     int
-	menuPauseMusicObserverId  int
-	menuResumeMusicObserverId int
-	musicToggle               int32
+	app                      *Application
+	outdoorMusic             *twodee.Music
+	exploreMusic             *twodee.Music
+	warningMusic             *twodee.Music
+	dangerMusic              *twodee.Music
+	outdoorMusicObserverId   int
+	exploreMusicObserverId   int
+	warningMusicObserverId   int
+	dangerMusicObserverId    int
+	pauseMusicObserverId     int
+	resumeMusicObserverId    int
+	menuPauseMusicObserverId int
+	musicToggle              int32
 }
 
 func (a *AudioSystem) PlayOutdoorMusic(e twodee.GETyper) {
@@ -77,12 +76,6 @@ func (a *AudioSystem) MenuPauseMusic(e twodee.GETyper) {
 	}
 }
 
-func (a *AudioSystem) MenuResumeMusic(e twodee.GETyper) {
-	if twodee.MusicIsPaused() {
-		twodee.ResumeMusic()
-	}
-}
-
 func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(PlayOutdoorMusic, a.outdoorMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayExploreMusic, a.exploreMusicObserverId)
@@ -91,7 +84,6 @@ func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(PauseMusic, a.pauseMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(ResumeMusic, a.resumeMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(MenuPauseMusic, a.menuPauseMusicObserverId)
-	a.app.GameEventHandler.RemoveObserver(MenuResumeMusic, a.menuResumeMusicObserverId)
 	a.exploreMusic.Delete()
 }
 
@@ -129,6 +121,5 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.pauseMusicObserverId = app.GameEventHandler.AddObserver(PauseMusic, audioSystem.PauseMusic)
 	audioSystem.resumeMusicObserverId = app.GameEventHandler.AddObserver(ResumeMusic, audioSystem.ResumeMusic)
 	audioSystem.menuPauseMusicObserverId = app.GameEventHandler.AddObserver(MenuPauseMusic, audioSystem.MenuPauseMusic)
-	audioSystem.menuResumeMusicObserverId = app.GameEventHandler.AddObserver(MenuResumeMusic, audioSystem.MenuResumeMusic)
 	return
 }

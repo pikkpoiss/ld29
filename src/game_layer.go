@@ -22,12 +22,13 @@ func NewRain() *twodee.AnimatingEntity {
 }
 
 type GameLayer struct {
-	Level         *Level
-	BatchRenderer *twodee.BatchRenderer
-	TileRenderer  *twodee.TileRenderer
-	Bounds        twodee.Rectangle
-	App           *Application
-	Rain          *twodee.AnimatingEntity
+	Level                     *Level
+	BatchRenderer             *twodee.BatchRenderer
+	TileRenderer              *twodee.TileRenderer
+	Bounds                    twodee.Rectangle
+	App                       *Application
+	menuResumeMusicObserverId int
+	Rain                      *twodee.AnimatingEntity
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
@@ -49,6 +50,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 		return
 	}
 	layer.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayOutdoorMusic))
+	layer.menuResumeMusicObserverId = layer.App.GameEventHandler.AddObserver(MenuResumeMusic, layer.MenuResumeMusic)
 	return
 }
 
@@ -83,6 +85,7 @@ func (l *GameLayer) Delete() {
 	if l.BatchRenderer != nil {
 		l.BatchRenderer.Delete()
 	}
+	l.App.GameEventHandler.RemoveObserver(MenuResumeMusic, l.menuResumeMusicObserverId)
 }
 
 func (l *GameLayer) Render() {
@@ -185,4 +188,17 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		}
 	}
 	return true
+}
+
+func (l *GameLayer) MenuResumeMusic(e twodee.GETyper) {
+	var layerWaterStatus = l.Level.GetLayerWaterStatus(l.Level.Active)
+	if l.Level.Active == 0 {
+		l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayOutdoorMusic))
+	} else if layerWaterStatus == 0 {
+		l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
+	} else if layerWaterStatus == 1 {
+		l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+	} else if layerWaterStatus == 2 {
+		l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+	}
 }
