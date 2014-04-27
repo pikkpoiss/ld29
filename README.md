@@ -16,14 +16,14 @@ Theme: "Beneath the surface"
   * [x] Vertical level switching.
   * [x] Music loading.
   * [ ] Water tracking / gauge.
-  * [ ] Player movement.
-  * [ ] Collision detection.
-  * [ ] Items.
+  * [x] Player movement.
+  * [x] Collision detection.
+  * [x] Items.
   * [ ] Level tiles for dry, partial, drowned levels.
   * [x] Menus.
-  * [ ] Load player sprite sheet.
+  * [x] Load player sprite sheet.
   * [ ] Optimize top/player/bottom rendering.
-  * [ ] Triggers for running over items and transition tiles.
+  * [x] Triggers for running over items and transition tiles.
   * [ ] Sound effects
   * [ ] End state
   * [ ] Pickaxe and barriers.
