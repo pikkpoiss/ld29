@@ -50,7 +50,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	return
 }
 
-const LevelWaterThreshold time.Duration = twodee.Step60Hz * 60
+const LevelWaterThreshold time.Duration = time.Duration(30) * time.Second
 
 type LayerWaterStatus int
 
@@ -295,9 +295,16 @@ func (l *Level) Update(elapsed time.Duration) {
 }
 
 func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
-	var percent = l.WaterAccumulation / LevelWaterThreshold
-	if percent >= 1 {
+	var percentFlooded = (int32)(l.WaterAccumulation / LevelWaterThreshold)
+	if percentFlooded >= 1 {
 		return Flooded
+	}
+	var layerLevelBottom = (l.Layers - layer) / l.Layers
+	var layerLevelTop = ((l.Layers - layer) + 1) / l.Layers
+	if percentFlooded >= layerLevelTop {
+		return Flooded
+	} else if percentFlooded >= layerLevelBottom {
+		return Wet
 	}
 	return Dry
 }
