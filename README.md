@@ -24,7 +24,7 @@ Theme: "Beneath the surface"
   * [x] Load player sprite sheet.
   * [x] Triggers for running over items and transition tiles.
   * [x] Destructable item framework.
-  * [ ] Health bar.
+  * [x] Health bar.
   * [ ] Show picked up items.
   * [ ] End state.
   * [ ] Splash screen.

@@ -19,6 +19,8 @@ const (
 	HudWaterYPadding  = 1
 	HudHealthXPadding = 2
 	HudHealthYPadding = 0
+	HudItemXPadding   = 1
+	HudItemYPadding   = 1.5
 	EmptyWaterTile    = 40
 	FullWaterTile     = 41
 	EmptyHealthTile   = 42
@@ -73,7 +75,7 @@ func (l *HudLayer) RenderHealth() {
 		tiles  = HudWidth - (2 * HudHealthXPadding)
 		filled = int(health * float32(tiles))
 	)
-	if health == 1.0 {
+	if health >= 1.0 {
 		return
 	}
 	for i := 0; i < tiles; i++ {
@@ -89,10 +91,21 @@ func (l *HudLayer) RenderHealth() {
 	}
 }
 
+func (l *HudLayer) RenderItems() {
+	for i, item := range l.game.Level.Player.Inventory {
+		var (
+			x = float32(i+HudItemXPadding) + 0.5
+			y = float32(HudItemYPadding) - 0.5
+		)
+		l.TileRenderer.Draw(item.Frame(), x, y, 0, false, false)
+	}
+}
+
 func (l *HudLayer) Render() {
 	l.TileRenderer.Bind()
 	l.RenderWater()
 	l.RenderHealth()
+	l.RenderItems()
 	l.TileRenderer.Unbind()
 }
 

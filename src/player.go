@@ -241,10 +241,13 @@ func (p *Player) AddToInventory(item *Item) {
 	switch item.Id {
 	case Item1:
 		p.MaxHealth += 100
+		p.Health += 100
 	case Item2:
 		p.MaxHealth += 100
+		p.Health += 100
 	case Item3:
 		p.MaxHealth += PlayerBaseHealth
+		p.Health += PlayerBaseHealth
 	case Item4:
 		if p.Speed < PlayerFastSpeed {
 			p.Speed = PlayerFastSpeed
@@ -266,6 +269,9 @@ func (p *Player) Update(elapsed time.Duration) {
 	p.AnimatingEntity.Update(elapsed)
 	if p.Health < p.MaxHealth {
 		p.Health += PlayerHealthRegen
+		if p.Health > p.MaxHealth {
+			p.Health = p.MaxHealth
+		}
 	}
 }
 

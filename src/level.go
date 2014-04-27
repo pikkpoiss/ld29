@@ -400,7 +400,7 @@ func (l *Level) Update(elapsed time.Duration) {
 			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
 		}
 	}
-	if currentWaterStatus == Flooded {
+	if l.Active != 0 && currentWaterStatus == Flooded {
 		l.Player.Damage(PlayerWaterDamage)
 	}
 }
