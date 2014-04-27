@@ -1,6 +1,9 @@
 package main
 
-import "../libs/twodee"
+import (
+	"../libs/twodee"
+	"time"
+)
 
 type DirectionsHistoryEntry struct {
 	prev, next *DirectionsHistoryEntry
@@ -67,7 +70,8 @@ func NewDirectionsHistory() (dh *DirectionsHistory) {
 
 type Player struct {
 	*twodee.AnimatingEntity
-	Health            float32
+	MaxHealth         int32
+	Health            int32
 	Speed             float32
 	Velocity          twodee.Point
 	DirectionsHistory *DirectionsHistory
@@ -92,6 +96,16 @@ const (
 	Down
 	ClimbUp
 	ClimbDown
+)
+
+const (
+	Fudge                = 0.02
+	PlayerBaseSpeed      = 0.2
+	PlayerFastSpeed      = 0.3
+	PlayerSuperFastSpeed = 0.4
+	PlayerBaseHealth     = 1000
+	PlayerWaterDamage    = 10
+	PlayerHealthRegen    = 4
 )
 
 var PlayerAnimations = map[EntityState][]int{
@@ -119,7 +133,8 @@ func NewPlayer(x, y float32) (player *Player) {
 			twodee.Step10Hz,
 			[]int{8},
 		),
-		Health:            100.0,
+		MaxHealth:         PlayerBaseHealth,
+		Health:            PlayerBaseHealth,
 		Speed:             PlayerBaseSpeed,
 		Velocity:          twodee.Pt(0, 0),
 		DirectionsHistory: NewDirectionsHistory(),
@@ -176,8 +191,6 @@ func (p *Player) UpdateDesiredMove(d MoveDirection, invert bool) {
 	p.DesiredMove = p.DirectionsHistory.LatestDirection()
 }
 
-const Fudge = 0.02
-
 func (p *Player) AttemptMove(l *Level) {
 	if !p.CanMove {
 		return
@@ -223,21 +236,15 @@ func (p *Player) AttemptMove(l *Level) {
 	}
 }
 
-const (
-	PlayerBaseSpeed      = 0.2
-	PlayerFastSpeed      = 0.3
-	PlayerSuperFastSpeed = 0.4
-)
-
 func (p *Player) AddToInventory(item *Item) {
 	p.Inventory = append(p.Inventory, item)
 	switch item.Id {
 	case Item1:
-		p.Health = p.Health + 10
+		p.MaxHealth += 100
 	case Item2:
-		p.Health = p.Health + 20
+		p.MaxHealth += 100
 	case Item3:
-		p.Health = p.Health + 30
+		p.MaxHealth += PlayerBaseHealth
 	case Item4:
 		if p.Speed < PlayerFastSpeed {
 			p.Speed = PlayerFastSpeed
@@ -253,4 +260,19 @@ func (p *Player) AddToInventory(item *Item) {
 
 func (p *Player) CanDestroy(item *Item) bool {
 	return p.destroyableItems[item.Id]
+}
+
+func (p *Player) Update(elapsed time.Duration) {
+	p.AnimatingEntity.Update(elapsed)
+	if p.Health < p.MaxHealth {
+		p.Health += PlayerHealthRegen
+	}
+}
+
+func (p *Player) Damage(damage int32) {
+	p.Health -= damage
+}
+
+func (p *Player) HealthPercent() float32 {
+	return float32(p.Health) / float32(p.MaxHealth)
 }

@@ -13,12 +13,16 @@ type HudLayer struct {
 }
 
 const (
-	HudHeight   = 20
-	HudWidth    = 20
-	HudXPadding = 0
-	HudYPadding = 1
-	EmptyTile   = 40
-	FullTile    = 41
+	HudHeight         = 20
+	HudWidth          = 20
+	HudWaterXPadding  = 0
+	HudWaterYPadding  = 1
+	HudHealthXPadding = 2
+	HudHealthYPadding = 0
+	EmptyWaterTile    = 40
+	FullWaterTile     = 41
+	EmptyHealthTile   = 42
+	FullHealthTile    = 43
 )
 
 func NewHudLayer(app *Application, game *GameLayer) (layer *HudLayer, err error) {
@@ -45,23 +49,50 @@ func (l *HudLayer) Delete() {
 	}
 }
 
-func (l *HudLayer) Render() {
-	l.TileRenderer.Bind()
+func (l *HudLayer) RenderWater() {
 	var (
-		tiles  = HudHeight - (2 * HudYPadding)
+		tiles  = HudHeight - (2 * HudWaterYPadding)
 		filled = int(l.game.Level.GetTotalWaterPercent() * float32(tiles))
 	)
 	for i := 0; i < tiles; i++ {
 		var (
-			x    = float32(HudWidth-HudXPadding) - 0.5
-			y    = float32(i+HudYPadding) + 0.5
-			tile = EmptyTile
+			x    = float32(HudWidth-HudWaterXPadding) - 0.5
+			y    = float32(i+HudWaterYPadding) + 0.5
+			tile = EmptyWaterTile
 		)
 		if i < filled {
-			tile = FullTile
+			tile = FullWaterTile
 		}
 		l.TileRenderer.Draw(tile, x, y, 0, false, false)
 	}
+}
+
+func (l *HudLayer) RenderHealth() {
+	var (
+		health = l.game.Level.Player.HealthPercent()
+		tiles  = HudWidth - (2 * HudHealthXPadding)
+		filled = int(health * float32(tiles))
+	)
+	if health == 1.0 {
+		return
+	}
+	for i := 0; i < tiles; i++ {
+		var (
+			x    = float32(i+HudHealthXPadding) + 0.5
+			y    = float32(HudHeight-HudHealthYPadding) - 0.5
+			tile = EmptyHealthTile
+		)
+		if i < filled {
+			tile = FullHealthTile
+		}
+		l.TileRenderer.Draw(tile, x, y, 0, false, false)
+	}
+}
+
+func (l *HudLayer) Render() {
+	l.TileRenderer.Bind()
+	l.RenderWater()
+	l.RenderHealth()
 	l.TileRenderer.Unbind()
 }
 
