@@ -25,7 +25,7 @@ Theme: "Beneath the surface"
   * [x] Triggers for running over items and transition tiles.
   * [x] Destructable item framework.
   * [x] Health bar.
-  * [ ] Show picked up items.
+  * [x] Show picked up items.
   * [ ] End state.
   * [ ] Splash screen.
   * [ ] Level tiles for dry, partial, drowned levels.
@@ -33,6 +33,7 @@ Theme: "Beneath the surface"
   * [ ] Snorkel.
   * [ ] Pickaxe and barrier tiles.
   * [ ] Pump tile.
+  * [ ] Map work.
 
 ## Brainstorming
 
