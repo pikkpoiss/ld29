@@ -170,7 +170,7 @@ func (p *Player) UpdateDesiredMove(d MoveDirection, invert bool) {
 	p.DesiredMove = p.DirectionsHistory.LatestDirection()
 }
 
-const Fudge = 0.01
+const Fudge = 0.02
 
 func (p *Player) AttemptMove(l *Level) {
 	if !p.CanMove {

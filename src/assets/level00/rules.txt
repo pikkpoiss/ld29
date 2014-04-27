@@ -1,2 +1,4 @@
 rules_copy.tmx
 rules_collisions.tmx
+rules_walls.tmx
+rules_corners.tmx
