@@ -31,17 +31,18 @@ type Level struct {
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(10, 5)
+	var player = NewPlayer(10, 5, eventSystem)
 	l = &Level{
-		Height:            0,
-		Grids:             []*twodee.Grid{},
-		Items:             [][]*Item{},
-		Geometry:          []*twodee.Batch{},
-		GridRatios:        []float32{},
-		Layers:            0,
-		Active:            0,
-		Player:            player,
-		eventSystem:       eventSystem,
+		Height:      0,
+		Grids:       []*twodee.Grid{},
+		Items:       [][]*Item{},
+		Geometry:    []*twodee.Batch{},
+		GridRatios:  []float32{},
+		Layers:      0,
+		Active:      0,
+		Player:      player,
+		eventSystem: eventSystem,
+		//WaterAccumulation: LevelWaterThreshold,
 		WaterAccumulation: 0,
 		Paused:            false,
 	}
@@ -366,12 +367,14 @@ func (l *Level) LayerAdvance() {
 	})
 	l.Active++
 	l.Transitions[l.Active] = NewLinearTween(-1, 0, BotSlideSpeed)
+	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayFallDownEffect))
 }
 
 func (l *Level) LayerRewind() {
 	if l.Active <= 0 {
 		return
 	}
+	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayClimbUpEffect))
 	var newWaterLevel = l.GetLayerWaterStatus(l.Active - 1)
 	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
 	if l.Active == 1 {
@@ -434,6 +437,8 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	if l.Player.HealthPercent() == 0 {
 		l.eventSystem.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayGameOverEffect))
 	}
 }
 

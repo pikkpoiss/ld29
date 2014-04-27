@@ -26,7 +26,7 @@ Theme: "Beneath the surface"
   * [x] Destructable item framework.
   * [x] Health bar.
   * [x] Show picked up items.
-  * [ ] End state.
+  * [x] End state.
   * [x] Splash screen.
   * [ ] Level tiles for dry, partial, drowned levels.
   * [ ] Sound effects.

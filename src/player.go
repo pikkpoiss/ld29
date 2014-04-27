@@ -71,6 +71,7 @@ func NewDirectionsHistory() (dh *DirectionsHistory) {
 
 type Player struct {
 	*twodee.AnimatingEntity
+	EventSystem       *twodee.GameEventHandler
 	MaxHealth         int32
 	Health            int32
 	Speed             float32
@@ -124,7 +125,7 @@ var PlayerAnimations = map[EntityState][]int{
 	ClimbDown | Down: []int{48, 49, 50, 51, 52, 53, 54, 8},
 }
 
-func NewPlayer(x, y float32) (player *Player) {
+func NewPlayer(x, y float32, eventSystem *twodee.GameEventHandler) (player *Player) {
 	var (
 		inv = make([]*Item, 0, NumberOfItemTypes)
 	)
@@ -136,6 +137,7 @@ func NewPlayer(x, y float32) (player *Player) {
 			twodee.Step10Hz,
 			[]int{8},
 		),
+		EventSystem:       eventSystem,
 		MaxHealth:         PlayerBaseHealth,
 		Health:            PlayerBaseHealth,
 		Speed:             PlayerBaseSpeed,
@@ -242,6 +244,7 @@ func (p *Player) AttemptMove(l *Level) {
 }
 
 func (p *Player) AddToInventory(item *Item) {
+	p.EventSystem.Enqueue(twodee.NewBasicGameEvent(PlayPickupItemEffect))
 	p.Inventory = append(p.Inventory, item)
 	switch item.Id {
 	case Item1:

@@ -28,6 +28,10 @@ const (
 	DryWalk
 	WetWalk
 	PlayerPumped
+	PlayFallDownEffect
+	PlayClimbUpEffect
+	PlayPickupItemEffect
+	PlayGameOverEffect
 	sentinel
 )
 
