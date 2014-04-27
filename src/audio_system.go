@@ -94,16 +94,16 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		warningMusic *twodee.Music
 		dangerMusic  *twodee.Music
 	)
-	if outdoorMusic, err = twodee.NewMusic("assets/music/Outdoor_Theme_1.ogg"); err != nil {
+	if outdoorMusic, err = twodee.NewMusic("assets/music/Outdoor_Theme.ogg"); err != nil {
 		return
 	}
-	if exploreMusic, err = twodee.NewMusic("assets/music/Exploration_Theme_1.ogg"); err != nil {
+	if exploreMusic, err = twodee.NewMusic("assets/music/Exploration_Theme.ogg"); err != nil {
 		return
 	}
-	if warningMusic, err = twodee.NewMusic("assets/music/Warning_Theme_1.ogg"); err != nil {
+	if warningMusic, err = twodee.NewMusic("assets/music/Warning_Theme.ogg"); err != nil {
 		return
 	}
-	if dangerMusic, err = twodee.NewMusic("assets/music/Danger_Theme_1.ogg"); err != nil {
+	if dangerMusic, err = twodee.NewMusic("assets/music/Underwater_Theme.ogg"); err != nil {
 		return
 	}
 	audioSystem = &AudioSystem{
