@@ -96,8 +96,10 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	}
 	for i, maptile = range maptiles {
 		if maptile != nil {
+			itemId := ItemId(maptile.Index)
 			items = append(items, NewItem(
-				ItemType(maptile.Index),
+				itemId,
+				ItemIdToType[itemId],
 				"item",
 				(maptile.TileBounds.X+maptile.TileBounds.W)/PxPerUnit,
 				(maptile.TileBounds.Y+maptile.TileBounds.H)/PxPerUnit,
@@ -177,18 +179,35 @@ func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
 	}
 	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
 		l.Player.CanGetItem = false
-		switch pickup.Item.Id {
-		case ItemUp:
+		switch pickup.Item.Type {
+		case LayerThresholdItem:
 			l.Player.MoveTo(pickup.Item.Pos())
 			l.Player.CanMove = false
-			l.LayerRewind()
-		case ItemDown:
-			l.Player.MoveTo(pickup.Item.Pos())
-			l.Player.CanMove = false
-			l.LayerAdvance()
-		default:
+			switch pickup.Item.Id {
+			case ItemUp:
+				l.LayerRewind()
+			case ItemDown:
+				l.LayerAdvance()
+			}
+		case InventoryItem:
+			l.RemoveItem(pickup.Item)
 			l.Player.AddToInventory(pickup.Item)
 		}
+	}
+}
+
+// Removes the item from the current layer's Items slice.
+func (l *Level) RemoveItem(item *Item) {
+	layerItems := l.Items[l.Active]
+	index := -1
+	for i, levelItem := range layerItems {
+		if levelItem == item {
+			index = i
+			break
+		}
+	}
+	if index != -1 {
+		layerItems = append(layerItems[:index], layerItems[index+1:]...)
 	}
 }
 
@@ -236,6 +255,7 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 			break
 		}
 	}
+	// TODO(wes): Maybe remove this once items go away after pickup.
 	if !touchedItem {
 		// Prevent the player from triggering another item
 		// pickup until they've moved off of all items
@@ -309,12 +329,12 @@ func (l *Level) Update(elapsed time.Duration) {
 }
 
 func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
-	var percentFlooded = (int32)(l.WaterAccumulation / LevelWaterThreshold)
+	var percentFlooded = float32(l.WaterAccumulation) / float32(LevelWaterThreshold)
 	if percentFlooded >= 1 {
 		return Flooded
 	}
-	var layerLevelBottom = (l.Layers - layer) / l.Layers
-	var layerLevelTop = ((l.Layers - layer) + 1) / l.Layers
+	var layerLevelBottom = 1 - float32(layer)/float32(l.Layers)
+	var layerLevelTop = layerLevelBottom + (1.00 / float32(l.Layers))
 	if percentFlooded >= layerLevelTop {
 		return Flooded
 	} else if percentFlooded >= layerLevelBottom {

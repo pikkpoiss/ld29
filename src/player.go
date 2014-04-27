@@ -225,7 +225,7 @@ const (
 
 func (p *Player) AddToInventory(item *Item) {
 	p.Inventory = append(p.Inventory, item)
-	switch item.getType() {
+	switch item.Id {
 	case Item1:
 		p.Health = p.Health + 10
 	case Item2:
