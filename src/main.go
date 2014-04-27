@@ -32,6 +32,7 @@ func NewApplication() (app *Application, err error) {
 		counter           = twodee.NewCounter()
 		gameLayer         *GameLayer
 		menuLayer         *MenuLayer
+		hudLayer          *HudLayer
 		gameEventHandler  = twodee.NewGameEventHandler(NumGameEventTypes)
 		initiateCloseGame = false
 	)
@@ -61,10 +62,14 @@ func NewApplication() (app *Application, err error) {
 	if menuLayer, err = NewMenuLayer(winbounds, app); err != nil {
 		return
 	}
+	if hudLayer, err = NewHudLayer(app, gameLayer); err != nil {
+		return
+	}
 	if err = gameLayer.LoadLevel("assets/level00/"); err != nil {
 		return
 	}
 	layers.Push(gameLayer)
+	layers.Push(hudLayer)
 	layers.Push(menuLayer)
 	app.gameClosingObserverId = app.GameEventHandler.AddObserver(GameIsClosing, app.CloseGame)
 	return

@@ -332,8 +332,12 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.WaterAccumulation += elapsed
 }
 
+func (l *Level) GetTotalWaterPercent() float32 {
+	return float32(l.WaterAccumulation) / float32(LevelWaterThreshold)
+}
+
 func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
-	var percentFlooded = float32(l.WaterAccumulation) / float32(LevelWaterThreshold)
+	var percentFlooded = l.GetTotalWaterPercent()
 	if percentFlooded >= 1 {
 		return Flooded
 	}

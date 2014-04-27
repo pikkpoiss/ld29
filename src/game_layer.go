@@ -62,6 +62,12 @@ func (l *GameLayer) Delete() {
 	if l.Level != nil {
 		l.Level.Delete()
 	}
+	if l.TileRenderer != nil {
+		l.TileRenderer.Delete()
+	}
+	if l.BatchRenderer != nil {
+		l.BatchRenderer.Delete()
+	}
 }
 
 func (l *GameLayer) Render() {
