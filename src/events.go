@@ -32,6 +32,7 @@ const (
 	PlayClimbUpEffect
 	PlayPickupItemEffect
 	PlayGameOverEffect
+	PlayVictoryEffect
 	sentinel
 )
 
