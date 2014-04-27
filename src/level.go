@@ -368,6 +368,9 @@ func (l *Level) LayerRewind() {
 		l.Player.SetCallback(func() {
 			l.Player.CanMove = true
 			l.Player.SetState(Standing | Down)
+			if l.Active == 0 && l.Player.HasFinalItem {
+				l.eventSystem.Enqueue(NewShowSplashEvent(OverlayWinFrame))
+			}
 		})
 	})
 	l.Transitions[l.Active] = NewLinearTween(0, -1, BotSlideSpeed)

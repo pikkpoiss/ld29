@@ -6,6 +6,7 @@ import (
 )
 
 type OverlayLayer struct {
+
 	Game              *GameLayer
 	Events            *twodee.GameEventHandler
 	TileRenderer      *twodee.TileRenderer
@@ -80,6 +81,14 @@ func (l *OverlayLayer) HandleEvent(evt twodee.Event) bool {
 			break
 		}
 		switch event.Code {
+		case twodee.KeyUp:
+			fallthrough
+		case twodee.KeyDown:
+			fallthrough
+		case twodee.KeyLeft:
+			fallthrough
+		case twodee.KeyRight:
+			fallthrough
 		case twodee.KeyEscape:
 			fallthrough
 		case twodee.KeySpace:
@@ -87,6 +96,9 @@ func (l *OverlayLayer) HandleEvent(evt twodee.Event) bool {
 		case twodee.KeyEnter:
 			l.Game.Level.Unpause()
 			l.Showing = false
+			if l.Frame == OverlayDeathFrame || l.Frame == OverlayWinFrame {
+				l.Events.Enqueue(twodee.NewBasicGameEvent(GameIsClosing))
+			}
 			return false
 		}
 	}
