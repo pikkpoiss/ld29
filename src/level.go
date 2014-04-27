@@ -30,7 +30,7 @@ type Level struct {
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(10, 5)
+	var player = NewPlayer(10, 5, eventSystem)
 	l = &Level{
 		Height:            0,
 		Grids:             []*twodee.Grid{},
@@ -323,6 +323,7 @@ func (l *Level) LayerAdvance() {
 	if l.Active >= l.Layers-1 {
 		return
 	}
+	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayFallDownEffect))
 	var newWaterLevel = l.GetLayerWaterStatus(l.Active + 1)
 	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
 	if l.Active == 0 {
@@ -352,6 +353,7 @@ func (l *Level) LayerRewind() {
 	if l.Active <= 0 {
 		return
 	}
+	l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayClimbUpEffect))
 	var newWaterLevel = l.GetLayerWaterStatus(l.Active - 1)
 	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
 	if l.Active == 1 {
@@ -413,6 +415,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	if l.Player.HealthPercent() == 0 {
 		l.eventSystem.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayGameOverEffect))
 	}
 }
 
