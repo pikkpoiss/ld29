@@ -27,6 +27,7 @@ const (
 	ShowSplash
 	DryWalk
 	WetWalk
+	PlayerPumped
 	sentinel
 )
 
