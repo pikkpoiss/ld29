@@ -124,6 +124,7 @@ func NewPlayer(x, y float32) (player *Player) {
 		Inventory:         inv,
 		CanGetItem:        true,
 		CanMove:           true,
+		destroyableItems:  make(map[ItemId]bool),
 	}
 	return
 }
