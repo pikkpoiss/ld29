@@ -99,7 +99,7 @@ const (
 )
 
 const (
-	Fudge                = 0.02
+	Fudge                = 0.4
 	PlayerBaseSpeed      = 0.2
 	PlayerFastSpeed      = 0.3
 	PlayerSuperFastSpeed = 0.4
