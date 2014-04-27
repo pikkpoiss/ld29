@@ -17,8 +17,8 @@ const (
 	Item3
 	Item4
 	ItemFinal
-	ItemPump
-	ItemPickaxe
+	ItemPump    ItemId = 44
+	ItemPickaxe ItemId = iota
 	ItemRock
 	item_sentinel
 )
