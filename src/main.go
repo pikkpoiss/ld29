@@ -28,7 +28,7 @@ func NewApplication() (app *Application, err error) {
 	var (
 		layers            *twodee.Layers
 		context           *twodee.Context
-		winbounds         = twodee.Rect(0, 0, 600, 600)
+		winbounds         = twodee.Rect(0, 0, 640, 640)
 		counter           = twodee.NewCounter()
 		gameLayer         *GameLayer
 		menuLayer         *MenuLayer

@@ -25,7 +25,7 @@ type Level struct {
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
-	var player = NewPlayer(1,1)
+	var player = NewPlayer(2, 2)
 	l = &Level{
 		Height:      0,
 		Grids:       []*twodee.Grid{},
@@ -45,6 +45,8 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	}
 	return
 }
+
+const PxPerUnit float32 = 16.0
 
 func (l *Level) loadLayer(path, name string) (err error) {
 	var (
@@ -73,7 +75,22 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	}
 	tilemeta = twodee.TileMetadata{
 		Path:      path,
-		PxPerUnit: 32,
+		PxPerUnit: int(PxPerUnit),
+	}
+	if maptiles, err = m.TilesFromLayerName("entities"); err != nil {
+		return
+	}
+	for i, maptile = range maptiles {
+		if maptile != nil {
+			items = append(items, NewItem(
+				ItemType(maptile.Index),
+				"item",
+				(maptile.TileBounds.X + maptile.TileBounds.W)/PxPerUnit,
+				(maptile.TileBounds.Y + maptile.TileBounds.H)/PxPerUnit,
+				maptile.TileBounds.W/PxPerUnit,
+				maptile.TileBounds.H/PxPerUnit,
+			))
+		}
 	}
 	if maptiles, err = m.TilesFromLayerName("collision"); err != nil {
 		return
@@ -87,7 +104,6 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if maptiles, err = m.TilesFromLayerName("tiles"); err != nil {
 		return
 	}
-	// TODO: Somewhere in here we should load a bunch of *Items into items.
 	textiles = make([]twodee.TexturedTile, len(maptiles))
 	for i, maptile = range maptiles {
 		if maptile != nil {
@@ -97,7 +113,7 @@ func (l *Level) loadLayer(path, name string) (err error) {
 	if batch, err = twodee.LoadBatch(textiles, tilemeta); err != nil {
 		return
 	}
-	ratio = float32(grid.Width) * float32(tilemeta.PxPerUnit) / float32(m.TileWidth*m.Width)
+	ratio = float32(grid.Width) * PxPerUnit / float32(m.TileWidth*m.Width)
 	height = float32(grid.Height) / ratio
 	if l.Height < height {
 		l.Height = height

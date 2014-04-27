@@ -18,14 +18,14 @@ type GameLayer struct {
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	layer = &GameLayer{
 		App:    app,
-		Bounds: twodee.Rect(0, 0, 10, 10),
+		Bounds: twodee.Rect(0, 0, 20, 20),
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
 	}
 	tilem := twodee.TileMetadata{
 		Path:       "assets/entities.fw.png",
-		PxPerUnit:  32,
+		PxPerUnit:  int(PxPerUnit),
 		TileWidth:  32,
 		TileHeight: 32,
 	}
@@ -80,8 +80,15 @@ func (l *GameLayer) Render() {
 		if i == l.Level.Active {
 			l.BatchRenderer.Unbind()
 			l.TileRenderer.Bind()
+
+			for _, item := range l.Level.Items[i] {
+				pt := item.Pos()
+				l.TileRenderer.Draw(item.Frame(), pt.X, pt.Y+y, 0, false, false)
+			}
+
 			pt := l.Level.Player.Pos()
 			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
+
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}
