@@ -11,17 +11,18 @@ import (
 )
 
 type Level struct {
-	Height              float32
-	Grids               []*twodee.Grid
-	Items               [][]*Item
-	Geometry            []*twodee.Batch
-	GridRatios          []float32
-	Layers              int32
-	Player              *Player
-	Active              int32
-	Transitions         []*LinearTween
-	eventSystem         *twodee.GameEventHandler
-	onPlayerMoveEventId int
+	Height                      float32
+	Grids                       []*twodee.Grid
+	Items                       [][]*Item
+	Geometry                    []*twodee.Batch
+	GridRatios                  []float32
+	Layers                      int32
+	Player                      *Player
+	Active                      int32
+	Transitions                 []*LinearTween
+	eventSystem                 *twodee.GameEventHandler
+	onPlayerMoveEventId         int
+	onPlayerPickedUpItemEventId int
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
@@ -38,6 +39,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 		eventSystem: eventSystem,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
+	l.onPlayerPickedUpItemEventId = eventSystem.AddObserver(PlayerPickedUpItem, l.OnPlayerPickedUpItemEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
 			return
@@ -146,11 +148,18 @@ func (l *Level) Delete() {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
+	l.eventSystem.RemoveObserver(PlayerPickedUpItem, l.onPlayerPickedUpItemEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	if move, ok := e.(*PlayerMoveEvent); ok {
 		l.Player.DesiredMove = move.Dir
+	}
+}
+
+func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
+	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
+		l.Player.AddToInventory(pickup.Item)
 	}
 }
 
