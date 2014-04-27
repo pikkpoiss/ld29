@@ -8,18 +8,33 @@ import (
 	twodee "../libs/twodee"
 )
 
+func NewRain() *twodee.AnimatingEntity {
+	return twodee.NewAnimatingEntity(
+		0, 0,
+		32.0/PxPerUnit, 32.0/PxPerUnit,
+		0,
+		twodee.Step10Hz,
+		[]int{
+			56, 57, 58, 59, 60, 61, 62,
+			64, 65, 66, 67, 68, 69, 70,
+		},
+	)
+}
+
 type GameLayer struct {
 	Level         *Level
 	BatchRenderer *twodee.BatchRenderer
 	TileRenderer  *twodee.TileRenderer
 	Bounds        twodee.Rectangle
 	App           *Application
+	Rain          *twodee.AnimatingEntity
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	layer = &GameLayer{
 		App:    app,
 		Bounds: twodee.Rect(0, 0, 20, 20),
+		Rain:   NewRain(),
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
@@ -96,6 +111,16 @@ func (l *GameLayer) Render() {
 			pt := l.Level.Player.Pos()
 			l.TileRenderer.Draw(l.Level.Player.Frame(), pt.X, pt.Y+y, 0, l.Level.Player.FlippedX(), false)
 
+			if i == 0 {
+				var j = 0
+				for x := 0; x < 10; x++ {
+					for y := 0; y < 10; y++ {
+						l.TileRenderer.Draw(l.Rain.OffsetFrame(j), float32(2*x)+1, float32(2*y)+1, 0, false, false)
+						j += 3
+					}
+				}
+			}
+
 			l.TileRenderer.Unbind()
 			l.BatchRenderer.Bind()
 		}
@@ -106,6 +131,7 @@ func (l *GameLayer) Render() {
 
 func (l *GameLayer) Update(elapsed time.Duration) {
 	l.Level.Update(elapsed)
+	l.Rain.Update(elapsed)
 }
 
 func (l *GameLayer) Reset() (err error) {
