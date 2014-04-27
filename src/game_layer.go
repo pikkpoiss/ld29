@@ -1,10 +1,11 @@
 package main
 
 import (
-	twodee "../libs/twodee"
 	"os"
 	"strings"
 	"time"
+
+	twodee "../libs/twodee"
 )
 
 type GameLayer struct {
@@ -113,25 +114,25 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		switch event.Code {
 		case twodee.KeyUp:
 			if released {
-				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(North))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(North))
 			}
 		case twodee.KeyRight:
 			if released {
-				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(East))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(East))
 			}
 		case twodee.KeyDown:
 			if released {
-				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(South))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(South))
 			}
 		case twodee.KeyLeft:
 			if released {
-				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(None))
+				l.App.GameEventHandler.Enqueue(NewInversePlayerMoveEvent(West))
 			} else {
 				l.App.GameEventHandler.Enqueue(NewPlayerMoveEvent(West))
 			}

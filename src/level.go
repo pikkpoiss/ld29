@@ -23,20 +23,22 @@ type Level struct {
 	eventSystem                 *twodee.GameEventHandler
 	onPlayerMoveEventId         int
 	onPlayerPickedUpItemEventId int
+	WaterAccumulation           time.Duration
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
 	var player = NewPlayer(2, 2)
 	l = &Level{
-		Height:      0,
-		Grids:       []*twodee.Grid{},
-		Items:       [][]*Item{},
-		Geometry:    []*twodee.Batch{},
-		GridRatios:  []float32{},
-		Layers:      0,
-		Active:      0,
-		Player:      player,
-		eventSystem: eventSystem,
+		Height:            0,
+		Grids:             []*twodee.Grid{},
+		Items:             [][]*Item{},
+		Geometry:          []*twodee.Batch{},
+		GridRatios:        []float32{},
+		Layers:            0,
+		Active:            0,
+		Player:            player,
+		eventSystem:       eventSystem,
+		WaterAccumulation: 0,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
 	l.onPlayerPickedUpItemEventId = eventSystem.AddObserver(PlayerPickedUpItem, l.OnPlayerPickedUpItemEvent)
@@ -47,6 +49,16 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	}
 	return
 }
+
+const LevelWaterThreshold time.Duration = time.Duration(30) * time.Second
+
+type LayerWaterStatus int
+
+const (
+	Dry LayerWaterStatus = iota
+	Wet
+	Flooded
+)
 
 const PxPerUnit float32 = 16.0
 
@@ -154,7 +166,8 @@ func (l *Level) Delete() {
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	if move, ok := e.(*PlayerMoveEvent); ok {
-		l.Player.DesiredMove = move.Dir
+		l.Player.UpdateDesiredMove(move.Dir, move.Inverse)
+		//		l.Player.DesiredMove = move.Dir
 	}
 }
 
@@ -283,4 +296,20 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	l.Player.Update(elapsed)
 	l.Player.AttemptMove(l)
+	l.WaterAccumulation += elapsed
+}
+
+func (l *Level) GetLayerWaterStatus(layer int32) LayerWaterStatus {
+	var percentFlooded = (int32)(l.WaterAccumulation / LevelWaterThreshold)
+	if percentFlooded >= 1 {
+		return Flooded
+	}
+	var layerLevelBottom = (l.Layers - layer) / l.Layers
+	var layerLevelTop = ((l.Layers - layer) + 1) / l.Layers
+	if percentFlooded >= layerLevelTop {
+		return Flooded
+	} else if percentFlooded >= layerLevelBottom {
+		return Wet
+	}
+	return Dry
 }

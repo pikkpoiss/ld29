@@ -25,25 +25,36 @@ const (
 	NumGameEventTypes = int(sentinel)
 )
 
-type MoveDirection int
+type MoveDirection byte
 
 const (
-	North MoveDirection = iota
+	None  MoveDirection = iota
+	North MoveDirection = 1 << (iota - 1)
 	East
 	South
 	West
-	None
 )
 
 type PlayerMoveEvent struct {
 	*twodee.BasicGameEvent
-	Dir MoveDirection
+	Dir     MoveDirection
+	Inverse bool
 }
 
 func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
 		twodee.NewBasicGameEvent(PlayerMove),
 		direction,
+		false,
+	}
+	return
+}
+
+func NewInversePlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
+	e = &PlayerMoveEvent{
+		twodee.NewBasicGameEvent(PlayerMove),
+		direction,
+		true,
 	}
 	return
 }

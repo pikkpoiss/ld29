@@ -1,18 +1,80 @@
 package main
 
-import (
-	"../libs/twodee"
-)
+import "../libs/twodee"
+
+type DirectionsHistoryEntry struct {
+	prev, next *DirectionsHistoryEntry
+	dir        MoveDirection
+}
+
+type DirectionsHistory struct {
+	tail       *DirectionsHistoryEntry
+	directions []*DirectionsHistoryEntry
+}
+
+// Adds a MoveDirection to the history if it's not already present.
+func (dh *DirectionsHistory) Add(d MoveDirection) {
+	entry := dh.directions[d]
+	if entry.prev == nil && entry.next == nil && entry != dh.tail {
+		if dh.tail != nil {
+			dh.tail.next = entry
+			entry.prev = dh.tail
+		}
+		dh.tail = entry
+	}
+}
+
+// Removes a particular MoveDirection from the history chain; sets its prev and next fields to nil. Resets dh's tail if necessary.
+func (dh *DirectionsHistory) Remove(d MoveDirection) {
+	entry := dh.directions[d]
+	if entry.prev != nil {
+		entry.prev.next = entry.next
+	}
+	if entry.next != nil {
+		entry.next.prev = entry.prev
+	}
+	if entry == dh.tail {
+		dh.tail = entry.prev
+	}
+	entry.prev = nil
+	entry.next = nil
+}
+
+func (dh *DirectionsHistory) LatestDirection() (d MoveDirection) {
+	if dh.tail != nil {
+		return dh.tail.dir
+	}
+	return None
+}
+
+func NewDirectionsHistory() (dh *DirectionsHistory) {
+	// Ugh, West+1 because we're generating a sparse array indexed on the
+	// int value of directions; West should be the last one enumerated.
+	dh = &DirectionsHistory{
+		tail:       nil,
+		directions: make([]*DirectionsHistoryEntry, West+1),
+	}
+	dirs := []MoveDirection{North, East, South, West}
+	for _, d := range dirs {
+		dh.directions[d] = &DirectionsHistoryEntry{
+			prev: nil,
+			next: nil,
+			dir:  d,
+		}
+	}
+	return
+}
 
 type Player struct {
 	*twodee.AnimatingEntity
-	Health      float32
-	Speed       float32
-	Velocity    twodee.Point
-	DesiredMove MoveDirection
-	Inventory   []*Item
-	State       EntityState
-	CanGetItem  bool
+	Health            float32
+	Speed             float32
+	Velocity          twodee.Point
+	DirectionsHistory *DirectionsHistory
+	DesiredMove       MoveDirection
+	Inventory         []*Item
+	State             EntityState
+	CanGetItem        bool
 }
 
 type EntityState int32
@@ -52,12 +114,13 @@ func NewPlayer(x, y float32) (player *Player) {
 			twodee.Step10Hz,
 			[]int{8},
 		),
-		Health:      100.0,
-		Speed:       PlayerBaseSpeed,
-		Velocity:    twodee.Pt(0, 0),
-		DesiredMove: None,
-		Inventory:   inv,
-		CanGetItem:  true,
+		Health:            100.0,
+		Speed:             PlayerBaseSpeed,
+		Velocity:          twodee.Pt(0, 0),
+		DirectionsHistory: NewDirectionsHistory(),
+		DesiredMove:       None,
+		Inventory:         inv,
+		CanGetItem:        true,
 	}
 	return
 }
@@ -85,6 +148,24 @@ func (p *Player) SetState(state EntityState) {
 
 func (p *Player) FlippedX() bool {
 	return p.State&Left > 0
+}
+
+// Updates the Player's desired movement direction as well as the affiliated data
+// structures. If `invert`, then the movement key has been released and we should
+// remove it from the affiliated data structures and perhaps pick a new movement
+// direction from the tail of OrderedDirections.
+func (p *Player) UpdateDesiredMove(d MoveDirection, invert bool) {
+	if invert {
+		p.DirectionsHistory.Remove(d)
+		p.DesiredMove = p.DirectionsHistory.LatestDirection()
+		return
+	}
+	// If the player is already moving in this direction, do nothing.
+	if p.DesiredMove == d {
+		return
+	}
+	p.DirectionsHistory.Add(d)
+	p.DesiredMove = p.DirectionsHistory.LatestDirection()
 }
 
 const Fudge = 0.01
