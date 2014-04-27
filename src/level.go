@@ -383,7 +383,17 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	l.Player.Update(elapsed)
 	l.Player.AttemptMove(l)
+	var currentWaterStatus = l.GetLayerWaterStatus(l.Active)
 	l.WaterAccumulation += elapsed
+	var newWaterStatus = l.GetLayerWaterStatus(l.Active)
+	if l.Active != 0 && (newWaterStatus > currentWaterStatus) {
+		if newWaterStatus == 1 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+		} else {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+		}
+	}
+
 }
 
 func (l *Level) GetTotalWaterPercent() float32 {
