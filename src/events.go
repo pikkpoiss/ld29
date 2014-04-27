@@ -40,14 +40,14 @@ const (
 )
 
 type PlayerMoveEvent struct {
-	*twodee.BasicGameEvent
+	twodee.BasicGameEvent
 	Dir     MoveDirection
 	Inverse bool
 }
 
 func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
-		twodee.NewBasicGameEvent(PlayerMove),
+		*twodee.NewBasicGameEvent(PlayerMove),
 		direction,
 		false,
 	}
@@ -56,7 +56,7 @@ func NewPlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 
 func NewInversePlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	e = &PlayerMoveEvent{
-		twodee.NewBasicGameEvent(PlayerMove),
+		*twodee.NewBasicGameEvent(PlayerMove),
 		direction,
 		true,
 	}
@@ -64,39 +64,39 @@ func NewInversePlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 }
 
 type PlayerTouchedItemEvent struct {
-	*twodee.BasicGameEvent
+	twodee.BasicGameEvent
 	Item *Item
 }
 
 func NewPlayerTouchedItemEvent(i *Item) (e *PlayerTouchedItemEvent) {
 	e = &PlayerTouchedItemEvent{
-		twodee.NewBasicGameEvent(PlayerTouchedItem),
+		*twodee.NewBasicGameEvent(PlayerTouchedItem),
 		i,
 	}
 	return
 }
 
 type PlayerUsedItemEvent struct {
-	*twodee.BasicGameEvent
+	twodee.BasicGameEvent
 	Item *Item
 }
 
 func NewPlayerUsedItemEvent(i *Item) (e *PlayerUsedItemEvent) {
 	e = &PlayerUsedItemEvent{
-		twodee.NewBasicGameEvent(PlayerUsedItem),
+		*twodee.NewBasicGameEvent(PlayerUsedItem),
 		i,
 	}
 	return
 }
 
 type PlayerDestroyedItemEvent struct {
-	*twodee.BasicGameEvent
+	twodee.BasicGameEvent
 	Item *Item
 }
 
 func NewPlayerDestroyedItemEvent(i *Item) (e *PlayerDestroyedItemEvent) {
 	e = &PlayerDestroyedItemEvent{
-		twodee.NewBasicGameEvent(PlayerDestroyedItem),
+		*twodee.NewBasicGameEvent(PlayerDestroyedItem),
 		i,
 	}
 	return

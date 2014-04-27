@@ -214,8 +214,7 @@ func (l *Level) OnPlayerUsedItemEvent(e twodee.GETyper) {
 	if used, ok := e.(*PlayerUsedItemEvent); ok {
 		switch used.Item.Id {
 		case ItemPump:
-			// TODO: lower the water level by some dy.
-			fmt.Println("usin' the pump!")
+			l.Player.IsPumping = true
 		}
 	}
 }
@@ -289,8 +288,9 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 			break
 		}
 	}
-	// TODO(wes): Maybe remove this once items go away after pickup.
 	if !touchedItem {
+		// Reset the player's pumping state.
+		l.Player.IsPumping = false
 		// Prevent the player from triggering another item
 		// pickup until they've moved off of all items
 		l.Player.CanGetItem = true
@@ -386,6 +386,12 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.Player.AttemptMove(l)
 	var currentWaterStatus = l.GetLayerWaterStatus(l.Active)
 	l.WaterAccumulation += elapsed
+	if l.Player.IsPumping {
+		l.WaterAccumulation -= 2 * elapsed
+		if l.WaterAccumulation < 0 {
+			l.WaterAccumulation = 0
+		}
+	}
 	var newWaterStatus = l.GetLayerWaterStatus(l.Active)
 	if l.Active != 0 && (newWaterStatus > currentWaterStatus) {
 		if newWaterStatus == 1 {
