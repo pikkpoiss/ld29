@@ -408,6 +408,9 @@ func (l *Level) Update(elapsed time.Duration) {
 	if l.Active != 0 && currentWaterStatus == Flooded {
 		l.Player.Damage(PlayerWaterDamage)
 	}
+	if l.Player.HealthPercent() == 0 {
+		l.eventSystem.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
+	}
 }
 
 func (l *Level) GetTotalWaterPercent() float32 {

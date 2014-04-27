@@ -51,6 +51,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	}
 	layer.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayOutdoorMusic))
 	layer.menuResumeMusicObserverId = layer.App.GameEventHandler.AddObserver(MenuResumeMusic, layer.MenuResumeMusic)
+	//layer.App.GameEventHandler.Enqueue(NewShowSplashEvent(OverlayDeathFrame))
 	return
 }
 

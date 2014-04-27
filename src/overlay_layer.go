@@ -6,11 +6,13 @@ import (
 )
 
 type OverlayLayer struct {
-	Game         *GameLayer
-	TileRenderer *twodee.TileRenderer
-	Bounds       twodee.Rectangle
-	Showing      bool
-	Frame        int
+	Game              *GameLayer
+	Events            *twodee.GameEventHandler
+	TileRenderer      *twodee.TileRenderer
+	Bounds            twodee.Rectangle
+	Showing           bool
+	Frame             int
+	observeShowSplash int
 }
 
 const (
@@ -22,6 +24,7 @@ const (
 func NewOverlayLayer(app *Application, game *GameLayer) (layer *OverlayLayer, err error) {
 	layer = &OverlayLayer{
 		Game:   game,
+		Events: app.GameEventHandler,
 		Bounds: twodee.Rect(0, 0, 1, 1),
 	}
 	tilem := twodee.TileMetadata{
@@ -35,13 +38,21 @@ func NewOverlayLayer(app *Application, game *GameLayer) (layer *OverlayLayer, er
 	if layer.TileRenderer, err = twodee.NewTileRenderer(layer.Bounds, app.WinBounds, tilem); err != nil {
 		return
 	}
+	layer.observeShowSplash = layer.Events.AddObserver(ShowSplash, layer.OnShowSplash)
 	return
+}
+
+func (l *OverlayLayer) OnShowSplash(e twodee.GETyper) {
+	if event, ok := e.(*ShowSplashEvent); ok {
+		l.Show(event.Frame)
+	}
 }
 
 func (l *OverlayLayer) Delete() {
 	if l.TileRenderer != nil {
 		l.TileRenderer.Delete()
 	}
+	l.Events.RemoveObserver(ShowSplash, l.observeShowSplash)
 }
 
 func (l *OverlayLayer) Show(frame int) {
@@ -68,9 +79,16 @@ func (l *OverlayLayer) HandleEvent(evt twodee.Event) bool {
 		if event.Type != twodee.Press {
 			break
 		}
-		l.Game.Level.Unpause()
-		l.Showing = false
-		return false
+		switch event.Code {
+		case twodee.KeyEscape:
+			fallthrough
+		case twodee.KeySpace:
+			fallthrough
+		case twodee.KeyEnter:
+			l.Game.Level.Unpause()
+			l.Showing = false
+			return false
+		}
 	}
 	return true
 }

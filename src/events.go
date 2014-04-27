@@ -22,6 +22,7 @@ const (
 	PlayerTouchedItem
 	PlayerUsedItem
 	PlayerDestroyedItem
+	ShowSplash
 	sentinel
 )
 
@@ -100,4 +101,16 @@ func NewPlayerDestroyedItemEvent(i *Item) (e *PlayerDestroyedItemEvent) {
 		i,
 	}
 	return
+}
+
+type ShowSplashEvent struct {
+	twodee.BasicGameEvent
+	Frame int
+}
+
+func NewShowSplashEvent(frame int) (e *ShowSplashEvent) {
+	return &ShowSplashEvent{
+		BasicGameEvent: *twodee.NewBasicGameEvent(ShowSplash),
+		Frame:          frame,
+	}
 }

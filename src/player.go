@@ -277,6 +277,9 @@ func (p *Player) Update(elapsed time.Duration) {
 
 func (p *Player) Damage(damage int32) {
 	p.Health -= damage
+	if p.Health < 0 {
+		p.Health = 0
+	}
 }
 
 func (p *Player) HealthPercent() float32 {

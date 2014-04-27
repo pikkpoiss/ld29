@@ -27,7 +27,7 @@ Theme: "Beneath the surface"
   * [x] Health bar.
   * [x] Show picked up items.
   * [ ] End state.
-  * [ ] Splash screen.
+  * [x] Splash screen.
   * [ ] Level tiles for dry, partial, drowned levels.
   * [ ] Sound effects.
   * [ ] Snorkel.
