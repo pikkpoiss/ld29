@@ -16,9 +16,9 @@
    eJwzYGBg0CECG0AxITV6QCxEBNYgQi0xaoabeaAw1CYCExPWMPOIiV8Q1qKif6kVJpSYp05kWBIbxqSGJ6H8Qan/0fUPBfOITd+6RJinQma4U+o/XPqGgnnEhj96PsCmDyQGABoiLZY=
   </data>
  </layer>
- <layer name="collision" width="20" height="20" visible="0">
+ <layer name="collision" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjZGBgYKQyJgYQo3akmketsKaVedQCtDaP2umZVubRy7/kmkcv9xFyL63NI9dfQ808amIAK6oAtQ==
+   eJxjZGBgYKQyJgYQo3akmketsKaVedQCtDaP2umZVuZR27+D3Txy0yKtzSPXX0PNPGpiAB1eAK8=
   </data>
  </layer>
  <layer name="entities" width="20" height="20" opacity="0.52">
