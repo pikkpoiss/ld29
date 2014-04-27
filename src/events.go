@@ -17,7 +17,8 @@ const (
 	PlayDangerMusic
 	PauseMusic
 	ResumeMusic
-	PlayerPickedUpItem
+	PlayerTouchedItem
+	PlayerDestroyedItem
 	sentinel
 )
 
@@ -59,14 +60,27 @@ func NewInversePlayerMoveEvent(direction MoveDirection) (e *PlayerMoveEvent) {
 	return
 }
 
-type PlayerPickedUpItemEvent struct {
+type PlayerTouchedItemEvent struct {
 	*twodee.BasicGameEvent
 	Item *Item
 }
 
-func NewPlayerPickedUpItemEvent(i *Item) (e *PlayerPickedUpItemEvent) {
-	e = &PlayerPickedUpItemEvent{
-		twodee.NewBasicGameEvent(PlayerPickedUpItem),
+func NewPlayerTouchedItemEvent(i *Item) (e *PlayerTouchedItemEvent) {
+	e = &PlayerTouchedItemEvent{
+		twodee.NewBasicGameEvent(PlayerTouchedItem),
+		i,
+	}
+	return
+}
+
+type PlayerDestroyedItemEvent struct {
+	*twodee.BasicGameEvent
+	Item *Item
+}
+
+func NewPlayerDestroyedItemEvent(i *Item) (e *PlayerDestroyedItemEvent) {
+	e = &PlayerDestroyedItemEvent{
+		twodee.NewBasicGameEvent(PlayerDestroyedItem),
 		i,
 	}
 	return

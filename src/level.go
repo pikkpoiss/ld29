@@ -11,19 +11,20 @@ import (
 )
 
 type Level struct {
-	Height                      float32
-	Grids                       []*twodee.Grid
-	Items                       [][]*Item
-	Geometry                    []*twodee.Batch
-	GridRatios                  []float32
-	Layers                      int32
-	Player                      *Player
-	Active                      int32
-	Transitions                 []*LinearTween
-	eventSystem                 *twodee.GameEventHandler
-	onPlayerMoveEventId         int
-	onPlayerPickedUpItemEventId int
-	WaterAccumulation           time.Duration
+	Height                       float32
+	Grids                        []*twodee.Grid
+	Items                        [][]*Item
+	Geometry                     []*twodee.Batch
+	GridRatios                   []float32
+	Layers                       int32
+	Player                       *Player
+	Active                       int32
+	Transitions                  []*LinearTween
+	eventSystem                  *twodee.GameEventHandler
+	onPlayerMoveEventId          int
+	onPlayerTouchedItemEventId   int
+	onPlayerDestroyedItemEventId int
+	WaterAccumulation            time.Duration
 }
 
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
@@ -41,7 +42,8 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 		WaterAccumulation: 0,
 	}
 	l.onPlayerMoveEventId = eventSystem.AddObserver(PlayerMove, l.OnPlayerMoveEvent)
-	l.onPlayerPickedUpItemEventId = eventSystem.AddObserver(PlayerPickedUpItem, l.OnPlayerPickedUpItemEvent)
+	l.onPlayerTouchedItemEventId = eventSystem.AddObserver(PlayerTouchedItem, l.OnPlayerTouchedItemEvent)
+	l.onPlayerDestroyedItemEventId = eventSystem.AddObserver(PlayerDestroyedItem, l.OnPlayerDestroyedItemEvent)
 	for _, name := range names {
 		if err = l.loadLayer(path, name); err != nil {
 			return
@@ -163,7 +165,8 @@ func (l *Level) Delete() {
 		l.Geometry[i].Delete()
 	}
 	l.eventSystem.RemoveObserver(PlayerMove, l.onPlayerMoveEventId)
-	l.eventSystem.RemoveObserver(PlayerPickedUpItem, l.onPlayerPickedUpItemEventId)
+	l.eventSystem.RemoveObserver(PlayerTouchedItem, l.onPlayerTouchedItemEventId)
+	l.eventSystem.RemoveObserver(PlayerDestroyedItem, l.onPlayerDestroyedItemEventId)
 }
 
 func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
@@ -173,26 +176,36 @@ func (l *Level) OnPlayerMoveEvent(e twodee.GETyper) {
 	}
 }
 
-func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
+func (l *Level) OnPlayerTouchedItemEvent(e twodee.GETyper) {
 	if !l.Player.CanGetItem {
 		return
 	}
-	if pickup, ok := e.(*PlayerPickedUpItemEvent); ok {
+	if touched, ok := e.(*PlayerTouchedItemEvent); ok {
 		l.Player.CanGetItem = false
-		switch pickup.Item.Type {
+		switch touched.Item.Type {
 		case LayerThresholdItem:
-			l.Player.MoveTo(pickup.Item.Pos())
+			l.Player.MoveTo(touched.Item.Pos())
 			l.Player.CanMove = false
-			switch pickup.Item.Id {
+			switch touched.Item.Id {
 			case ItemUp:
 				l.LayerRewind()
 			case ItemDown:
 				l.LayerAdvance()
 			}
 		case InventoryItem:
-			l.RemoveItem(pickup.Item)
-			l.Player.AddToInventory(pickup.Item)
+			l.RemoveItem(touched.Item)
+			l.Player.AddToInventory(touched.Item)
+		case DestructableItem:
+			if l.Player.CanDestroy(touched.Item) {
+				l.eventSystem.Enqueue(NewPlayerDestroyedItemEvent(touched.Item))
+			}
 		}
+	}
+}
+
+func (l *Level) OnPlayerDestroyedItemEvent(e twodee.GETyper) {
+	if destroyed, ok := e.(*PlayerDestroyedItemEvent); ok {
+		l.RemoveItem(destroyed.Item)
 	}
 }
 
@@ -254,7 +267,7 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 	touchedItem := false
 	for _, item := range l.Items[layer] {
 		if playerBounds.Overlaps(item.Bounds()) {
-			l.eventSystem.Enqueue(NewPlayerPickedUpItemEvent(item))
+			l.eventSystem.Enqueue(NewPlayerTouchedItemEvent(item))
 			touchedItem = true
 			break
 		}
@@ -291,6 +304,21 @@ func (l *Level) LayerAdvance() {
 	if l.Active >= l.Layers-1 {
 		return
 	}
+	var newWaterLevel = l.GetLayerWaterStatus(l.Active + 1)
+	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
+	if l.Active == 0 {
+		if newWaterLevel == 0 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
+		} else if newWaterLevel == 1 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+		} else if newWaterLevel == 2 {
+			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+		}
+	} else if newWaterLevel == 1 && previousWaterLevel == 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
+	} else if newWaterLevel == 2 && previousWaterLevel != 2 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
+	}
 	l.Transitions[l.Active] = NewLinearTween(0, l.Height, TopSlideSpeed)
 	l.Player.SetState(Standing | Down)
 	l.Transitions[l.Active].SetCallback(func() {
@@ -303,6 +331,15 @@ func (l *Level) LayerAdvance() {
 func (l *Level) LayerRewind() {
 	if l.Active <= 0 {
 		return
+	}
+	var newWaterLevel = l.GetLayerWaterStatus(l.Active - 1)
+	var previousWaterLevel = l.GetLayerWaterStatus(l.Active)
+	if l.Active == 1 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayOutdoorMusic))
+	} else if newWaterLevel == 0 && previousWaterLevel != 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayExploreMusic))
+	} else if newWaterLevel == 1 && previousWaterLevel != 0 {
+		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayWarningMusic))
 	}
 	l.Transitions[l.Active-1] = NewLinearTween(l.Height, 0, TopSlideSpeed)
 	l.Transitions[l.Active-1].SetCallback(func() {
