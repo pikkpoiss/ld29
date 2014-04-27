@@ -207,7 +207,11 @@ func (l *Level) RemoveItem(item *Item) {
 		}
 	}
 	if index != -1 {
-		layerItems = append(layerItems[:index], layerItems[index+1:]...)
+		copy(layerItems[index:], layerItems[index+1:])
+		layerItems[len(layerItems)-1] = nil
+		layerItems = layerItems[:len(layerItems)-1]
+		// Be sure to update the slice on the the level.
+		l.Items[l.Active] = layerItems
 	}
 }
 
