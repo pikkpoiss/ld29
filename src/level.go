@@ -400,7 +400,9 @@ func (l *Level) Update(elapsed time.Duration) {
 			l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayDangerMusic))
 		}
 	}
-
+	if currentWaterStatus == Flooded {
+		l.Player.Damage(PlayerWaterDamage)
+	}
 }
 
 func (l *Level) GetTotalWaterPercent() float32 {

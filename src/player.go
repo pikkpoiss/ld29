@@ -104,7 +104,7 @@ const (
 	PlayerFastSpeed      = 0.3
 	PlayerSuperFastSpeed = 0.4
 	PlayerBaseHealth     = 1000
-	PlayerWaterDamage    = 10
+	PlayerWaterDamage    = 6
 	PlayerHealthRegen    = 4
 )
 
