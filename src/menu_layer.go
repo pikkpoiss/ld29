@@ -143,6 +143,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			if event.Code == twodee.KeyEscape {
 				l.menu.Reset()
 				l.visible = true
+				l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuSelect))
 			}
 		}
 		return true
@@ -155,6 +156,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 		if data := l.menu.Select(); data != nil {
 			l.handleMenuItem(data)
 		}
+		l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuSelect))
 	case *twodee.MouseMoveEvent:
 		var (
 			y         = l.bounds.Max.Y
@@ -177,6 +179,7 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 				y = y - float32(texture.Height)
 				if my >= y {
 					if !item.Highlighted() {
+						l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuMove))
 						l.menu.HighlightItem(item)
 					}
 					break
@@ -190,17 +193,21 @@ func (l *MenuLayer) HandleEvent(evt twodee.Event) bool {
 		switch event.Code {
 		case twodee.KeyEscape:
 			l.visible = false
+			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuSelect))
 			return false
 		case twodee.KeyUp:
 			l.menu.Prev()
+			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuMove))
 			return false
 		case twodee.KeyDown:
 			l.menu.Next()
+			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuMove))
 			return false
 		case twodee.KeyEnter:
 			if data := l.menu.Select(); data != nil {
 				l.handleMenuItem(data)
 			}
+			l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(MenuSelect))
 			return false
 		}
 	}

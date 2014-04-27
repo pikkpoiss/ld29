@@ -19,10 +19,14 @@ const (
 	ResumeMusic
 	MenuPauseMusic
 	MenuResumeMusic
+	MenuMove
+	MenuSelect
 	PlayerTouchedItem
 	PlayerUsedItem
 	PlayerDestroyedItem
 	ShowSplash
+	DryWalk
+	WetWalk
 	sentinel
 )
 
