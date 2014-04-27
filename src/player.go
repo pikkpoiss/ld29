@@ -82,6 +82,7 @@ type Player struct {
 	CanMove           bool
 	IsPumping         bool
 	destroyableItems  map[ItemId]bool
+	HasFinalItem      bool
 }
 
 type EntityState int32
@@ -143,6 +144,7 @@ func NewPlayer(x, y float32) (player *Player) {
 		CanGetItem:        true,
 		CanMove:           true,
 		IsPumping:         false,
+		HasFinalItem:      false,
 		destroyableItems:  make(map[ItemId]bool),
 	}
 	return
@@ -256,6 +258,7 @@ func (p *Player) AddToInventory(item *Item) {
 		if p.Speed < PlayerSuperFastSpeed {
 			p.Speed = PlayerSuperFastSpeed
 		}
+		p.HasFinalItem = true
 	case ItemPickaxe:
 		p.destroyableItems[ItemRock] = true
 	}
