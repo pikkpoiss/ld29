@@ -93,11 +93,11 @@ func (a *AudioSystem) PlayMenuSelectEffect(e twodee.GETyper) {
 }
 
 func (a *AudioSystem) PlayDryWalkEffect(e twodee.GETyper) {
-	a.dryWalkEffect.Play(1)
+	a.dryWalkEffect.PlayChannel(6, 1)
 }
 
 func (a *AudioSystem) PlayWetWalkEffect(e twodee.GETyper) {
-	a.wetWalkEffect.Play(1)
+	a.wetWalkEffect.PlayChannel(6, 1)
 }
 
 func (a *AudioSystem) Delete() {
