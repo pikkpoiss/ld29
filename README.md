@@ -15,20 +15,23 @@ Theme: "Beneath the surface"
   * [x] Level loading.
   * [x] Vertical level switching.
   * [x] Music loading.
-  * [ ] Water tracking / gauge.
   * [x] Player movement.
   * [x] Collision detection.
+  * [x] Water tracking / gauge.
   * [x] Items.
-  * [ ] Level tiles for dry, partial, drowned levels.
+  * [x] Pump item type and pump events.
   * [x] Menus.
   * [x] Load player sprite sheet.
-  * [ ] Optimize top/player/bottom rendering.
   * [x] Triggers for running over items and transition tiles.
-  * [ ] Sound effects
-  * [ ] End state
   * [x] Destructable item framework.
+  * [ ] Health bar.
+  * [ ] Show picked up items.
+  * [ ] End state.
+  * [ ] Splash screen.
+  * [ ] Level tiles for dry, partial, drowned levels.
+  * [ ] Sound effects.
+  * [ ] Snorkel.
   * [ ] Pickaxe and barrier tiles.
-  * [x] Pump item type and pump events.
   * [ ] Pump tile.
 
 ## Brainstorming
