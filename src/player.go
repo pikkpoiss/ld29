@@ -76,6 +76,7 @@ type Player struct {
 	State             EntityState
 	CanGetItem        bool
 	CanMove           bool
+	IsPumping         bool
 	destroyableItems  map[ItemId]bool
 }
 
@@ -126,6 +127,7 @@ func NewPlayer(x, y float32) (player *Player) {
 		Inventory:         inv,
 		CanGetItem:        true,
 		CanMove:           true,
+		IsPumping:         false,
 		destroyableItems:  make(map[ItemId]bool),
 	}
 	return
