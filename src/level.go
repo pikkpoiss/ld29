@@ -262,6 +262,10 @@ func (l *Level) LayerRewind() {
 	l.Transitions[l.Active-1] = NewLinearTween(l.Height, 0, TopSlideSpeed)
 	l.Transitions[l.Active-1].SetCallback(func() {
 		l.Active--
+		l.Player.SetState(ClimbUp | Down)
+		l.Player.SetCallback(func() {
+			l.Player.SetState(Standing | Down)
+		})
 	})
 	l.Transitions[l.Active] = NewLinearTween(0, -1, BotSlideSpeed)
 }
