@@ -75,6 +75,7 @@ type Player struct {
 	Inventory         []*Item
 	State             EntityState
 	CanGetItem        bool
+	CanMove           bool
 }
 
 type EntityState int32
@@ -121,6 +122,7 @@ func NewPlayer(x, y float32) (player *Player) {
 		DesiredMove:       None,
 		Inventory:         inv,
 		CanGetItem:        true,
+		CanMove:           true,
 	}
 	return
 }
@@ -171,6 +173,9 @@ func (p *Player) UpdateDesiredMove(d MoveDirection, invert bool) {
 const Fudge = 0.01
 
 func (p *Player) AttemptMove(l *Level) {
+	if !p.CanMove {
+		return
+	}
 	var (
 		a, b, trunc twodee.Point
 		bounds      = p.Bounds()

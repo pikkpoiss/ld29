@@ -179,8 +179,12 @@ func (l *Level) OnPlayerPickedUpItemEvent(e twodee.GETyper) {
 		l.Player.CanGetItem = false
 		switch pickup.Item.Id {
 		case ItemUp:
+			l.Player.MoveTo(pickup.Item.Pos())
+			l.Player.CanMove = false
 			l.LayerRewind()
 		case ItemDown:
+			l.Player.MoveTo(pickup.Item.Pos())
+			l.Player.CanMove = false
 			l.LayerAdvance()
 		default:
 			l.Player.AddToInventory(pickup.Item)
@@ -264,6 +268,10 @@ func (l *Level) LayerAdvance() {
 		return
 	}
 	l.Transitions[l.Active] = NewLinearTween(0, l.Height, TopSlideSpeed)
+	l.Player.SetState(Standing | Down)
+	l.Transitions[l.Active].SetCallback(func() {
+		l.Player.CanMove = true
+	})
 	l.Active++
 	l.Transitions[l.Active] = NewLinearTween(-1, 0, BotSlideSpeed)
 }
@@ -277,6 +285,7 @@ func (l *Level) LayerRewind() {
 		l.Active--
 		l.Player.SetState(ClimbUp | Down)
 		l.Player.SetCallback(func() {
+			l.Player.CanMove = true
 			l.Player.SetState(Standing | Down)
 		})
 	})
