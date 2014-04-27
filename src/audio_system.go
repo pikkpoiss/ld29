@@ -14,6 +14,7 @@ type AudioSystem struct {
 	climbUpEffect            *twodee.SoundEffect
 	pickupItemEffect         *twodee.SoundEffect
 	gameOverEffect           *twodee.SoundEffect
+	victoryEffect            *twodee.SoundEffect
 	outdoorMusicObserverId   int
 	exploreMusicObserverId   int
 	warningMusicObserverId   int
@@ -29,6 +30,7 @@ type AudioSystem struct {
 	climbUpObserverId        int
 	pickupItemObserverId     int
 	gameOverObserverId       int
+	victoryObserverId        int
 	musicToggle              int32
 }
 
@@ -114,6 +116,10 @@ func (a *AudioSystem) PlayGameOverEffect(e twodee.GETyper) {
 	a.gameOverEffect.PlayChannel(7, 1)
 }
 
+func (a *AudioSystem) PlayVictoryEffect(e twodee.GETyper) {
+	a.victoryEffect.PlayChannel(7, 1)
+}
+
 func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(PlayOutdoorMusic, a.outdoorMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayExploreMusic, a.exploreMusicObserverId)
@@ -138,6 +144,7 @@ func (a *AudioSystem) Delete() {
 	a.climbUpEffect.Delete()
 	a.pickupItemEffect.Delete()
 	a.gameOverEffect.Delete()
+	a.victoryEffect.Delete()
 }
 
 func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
@@ -152,6 +159,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		climbUpEffect    *twodee.SoundEffect
 		pickupItemEffect *twodee.SoundEffect
 		gameOverEffect   *twodee.SoundEffect
+		victoryEffect    *twodee.SoundEffect
 	)
 	if outdoorMusic, err = twodee.NewMusic("assets/music/Outdoor_Theme.ogg"); err != nil {
 		return
@@ -183,6 +191,9 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	if gameOverEffect, err = twodee.NewSoundEffect("assets/soundeffects/GameOver.ogg"); err != nil {
 		return
 	}
+	if victoryEffect, err = twodee.NewSoundEffect("assets/soundeffects/Victory.ogg"); err != nil {
+		return
+	}
 	audioSystem = &AudioSystem{
 		app:              app,
 		outdoorMusic:     outdoorMusic,
@@ -195,6 +206,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		climbUpEffect:    climbUpEffect,
 		pickupItemEffect: pickupItemEffect,
 		gameOverEffect:   gameOverEffect,
+		victoryEffect:    victoryEffect,
 		musicToggle:      1,
 	}
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayOutdoorMusic, audioSystem.PlayOutdoorMusic)
@@ -210,5 +222,6 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.climbUpObserverId = app.GameEventHandler.AddObserver(PlayClimbUpEffect, audioSystem.PlayClimbUpEffect)
 	audioSystem.pickupItemObserverId = app.GameEventHandler.AddObserver(PlayPickupItemEffect, audioSystem.PlayPickupItemEffect)
 	audioSystem.gameOverObserverId = app.GameEventHandler.AddObserver(PlayGameOverEffect, audioSystem.PlayGameOverEffect)
+	audioSystem.victoryObserverId = app.GameEventHandler.AddObserver(PlayVictoryEffect, audioSystem.PlayVictoryEffect)
 	return
 }

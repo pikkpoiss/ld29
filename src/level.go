@@ -381,6 +381,8 @@ func (l *Level) LayerRewind() {
 			l.Player.SetState(Standing | Down)
 			if l.Active == 0 && l.Player.HasFinalItem {
 				l.eventSystem.Enqueue(NewShowSplashEvent(OverlayWinFrame))
+				l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+				l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayVictoryEffect))
 			}
 		})
 	})

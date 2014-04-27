@@ -29,7 +29,7 @@ Theme: "Beneath the surface"
   * [x] End state.
   * [x] Splash screen.
   * [ ] Level tiles for dry, partial, drowned levels.
-  * [ ] Sound effects.
+  * [x] Sound effects.
   * [ ] Snorkel.
   * [ ] Pickaxe and barrier tiles.
   * [ ] Pump tile.
