@@ -33,6 +33,18 @@ func NewWater() *twodee.AnimatingEntity {
 	)
 }
 
+func NewPump() *twodee.AnimatingEntity {
+	return twodee.NewAnimatingEntity(
+		0, 0,
+		32.0/PxPerUnit, 32.0/PxPerUnit,
+		0,
+		twodee.Step10Hz,
+		[]int{
+			44, 45, 46, 45,
+		},
+	)
+}
+
 const (
 	WaterEntityOffset = 80
 )
@@ -46,6 +58,7 @@ type GameLayer struct {
 	menuResumeMusicObserverId int
 	Rain                      *twodee.AnimatingEntity
 	Water                     *twodee.AnimatingEntity
+	Pump                      *twodee.AnimatingEntity
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
@@ -54,6 +67,7 @@ func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 		Bounds: twodee.Rect(0, 0, 20, 20),
 		Rain:   NewRain(),
 		Water:  NewWater(),
+		Pump:   NewPump(),
 	}
 	if layer.BatchRenderer, err = twodee.NewBatchRenderer(layer.Bounds, app.WinBounds); err != nil {
 		return
@@ -137,6 +151,9 @@ func (l *GameLayer) Render() {
 			for _, item := range l.Level.Items[i] {
 				pt := item.Pos()
 				frame := item.Frame()
+				if item.Id == ItemPump && l.Level.Player.IsPumping {
+					frame = l.Pump.Frame()
+				}
 				if waterStatus == Wet && i != 0 {
 					frame += WaterEntityOffset
 				}
@@ -176,6 +193,7 @@ func (l *GameLayer) Update(elapsed time.Duration) {
 	l.Level.Update(elapsed)
 	l.Rain.Update(elapsed)
 	l.Water.Update(elapsed)
+	l.Pump.Update(elapsed)
 }
 
 func (l *GameLayer) Reset() (err error) {
