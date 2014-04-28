@@ -4,7 +4,7 @@
   <image source="tiles.fw.png" width="256" height="256"/>
  </tileset>
  <tileset firstgid="257" name="entities.fw" tilewidth="32" tileheight="32">
-  <image source="../entities.fw.png" width="256" height="256"/>
+  <image source="../entities.fw.png" width="256" height="512"/>
  </tileset>
  <layer name="raw" width="20" height="20">
   <data encoding="base64" compression="zlib">
@@ -18,7 +18,7 @@
  </layer>
  <layer name="entities" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjYBi6gIlxYPSOFMA6GkbDBoymd/oCFjLDm5lMfQMVvwBPLQAc
+   eJxjYBi6gIlxYPSOglEw1MBoeqcvYCEzvJnJ1DdQ8QsANlYAFg==
   </data>
  </layer>
  <layer name="collision" width="20" height="20">
