@@ -33,7 +33,7 @@ Theme: "Beneath the surface"
   * [x] Snorkel.
   * [x] Pickaxe and barrier tiles.
   * [x] Pump tile.
-  * [ ] Map work.
+  * [x] Map work.
 
 ## Brainstorming
 
