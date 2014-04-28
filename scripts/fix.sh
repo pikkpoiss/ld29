@@ -4,6 +4,7 @@ chmod +w *.dylib
 
 BINARY=heavydrizzle
 
+install_name_tool -change /usr/local/opt/glfw3/lib/libglfw3.3.0.dylib @executable_path/libglfw3.dylib ${BINARY}
 install_name_tool -change /usr/local/lib/libGLEW.1.10.0.dylib @executable_path/libGLEW.1.10.0.dylib ${BINARY}
 install_name_tool -change /usr/lib/libGLEW.1.9.0.dylib @executable_path/libGLEW.1.9.0.dylib ${BINARY}
 install_name_tool -change /usr/local/lib/libSDL-1.2.0.dylib @executable_path/libSDL-1.2.0.dylib ${BINARY}
