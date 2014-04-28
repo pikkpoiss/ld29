@@ -1,3 +1,3 @@
 #!/bin/bash
 cd "${0%/*}"
-./heavydrizzle
+LD_LIBRARY_PATH=`pwd` ./heavydrizzle
