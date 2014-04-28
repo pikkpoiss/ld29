@@ -8,17 +8,17 @@
  </tileset>
  <layer name="raw" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjZmBgYKYyZqISHjVv1LxR80bNGzWPuuZREwMAvy4DbQ==
+   eJxjZmBgYKYBZsKDSVFDSB0peKiYNxQwNf06Gh8DGye0Nm+wx+9IU0dNDAD31QPJ
   </data>
  </layer>
  <layer name="tiles" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJwzYGBg0KESNgBiPSAWohLWGDVv1LxR80bNGzWPauaBymhtKmGQWQAl7COz
+   eJwzYGBgMABiHTzYgAQ1IKwFxEJ4sAqRakBm6RFQRwrWGALmgfysTSWMHCf44o4YTEr8EoOHSvzSKj4oiRN0cygNRw0GTHdREscqSO4c7PFLjHnqQKxLRfMGUh0x6dmABHUAgDQtPw==
   </data>
  </layer>
  <layer name="collision" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxjZGBgYKQyphYYNW/UvFHzRs0bNY+65lETAwD0WABN
+   eJxjZGBgYKQBxgdIUUNIHSlgqJg3FDA1/UotMJLjgxJ/09o8aoGBMm+4qaMmBgAtDgCp
   </data>
  </layer>
  <layer name="entities" width="20" height="20" opacity="0.52">
