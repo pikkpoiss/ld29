@@ -30,9 +30,9 @@ Theme: "Beneath the surface"
   * [x] Splash screen.
   * [ ] Level tiles for dry, partial, drowned levels.
   * [x] Sound effects.
-  * [ ] Snorkel.
-  * [ ] Pickaxe and barrier tiles.
-  * [ ] Pump tile.
+  * [x] Snorkel.
+  * [x] Pickaxe and barrier tiles.
+  * [x] Pump tile.
   * [ ] Map work.
 
 ## Brainstorming
