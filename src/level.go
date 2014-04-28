@@ -411,7 +411,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 	if l.Player.IsPumping {
 		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayerPumped))
-		l.WaterAccumulation -= 4 * elapsed
+		l.WaterAccumulation -= 8 * elapsed
 		if l.WaterAccumulation < 0 {
 			l.WaterAccumulation = 0
 		}
