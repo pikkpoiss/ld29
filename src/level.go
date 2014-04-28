@@ -33,16 +33,15 @@ type Level struct {
 func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler) (l *Level, err error) {
 	var player = NewPlayer(10, 5, eventSystem)
 	l = &Level{
-		Height:      0,
-		Grids:       []*twodee.Grid{},
-		Items:       [][]*Item{},
-		Geometry:    []*twodee.Batch{},
-		GridRatios:  []float32{},
-		Layers:      0,
-		Active:      0,
-		Player:      player,
-		eventSystem: eventSystem,
-		//WaterAccumulation: LevelWaterThreshold,
+		Height:            0,
+		Grids:             []*twodee.Grid{},
+		Items:             [][]*Item{},
+		Geometry:          []*twodee.Batch{},
+		GridRatios:        []float32{},
+		Layers:            0,
+		Active:            0,
+		Player:            player,
+		eventSystem:       eventSystem,
 		WaterAccumulation: 0,
 		Paused:            false,
 	}
@@ -407,9 +406,12 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.Player.AttemptMove(l)
 	var currentWaterStatus = l.GetLayerWaterStatus(l.Active)
 	l.WaterAccumulation += elapsed
+	if l.WaterAccumulation > LevelWaterThreshold {
+		l.WaterAccumulation = LevelWaterThreshold
+	}
 	if l.Player.IsPumping {
 		l.eventSystem.Enqueue(twodee.NewBasicGameEvent(PlayerPumped))
-		l.WaterAccumulation -= 2 * elapsed
+		l.WaterAccumulation -= 4 * elapsed
 		if l.WaterAccumulation < 0 {
 			l.WaterAccumulation = 0
 		}
