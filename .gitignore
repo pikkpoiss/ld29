@@ -25,4 +25,7 @@ _testmain.go
 # VIM tmp files
 *.swp
 
+# Build output
+build/*
+
 tags
