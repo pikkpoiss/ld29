@@ -293,7 +293,7 @@ func (l *Level) FrontierCollides(layer int32, a, b twodee.Point) bool {
 		if item.Bounds().IntersectedBy(a, b) {
 			l.eventSystem.Enqueue(NewPlayerTouchedItemEvent(item))
 			touchedItem = true
-			if item.Type == UseableItem {
+			if item.Type == UseableItem || item.Type == DestructableItem {
 				return true
 			}
 			break
