@@ -58,7 +58,7 @@ func LoadLevel(path string, names []string, eventSystem *twodee.GameEventHandler
 	return
 }
 
-const LevelWaterThreshold time.Duration = time.Duration(30) * time.Second
+const LevelWaterThreshold time.Duration = time.Duration(60) * time.Second
 
 type LayerWaterStatus int
 

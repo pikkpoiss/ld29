@@ -31,8 +31,8 @@ Theme: "Beneath the surface"
   * [x] Level tiles for dry, partial, drowned levels.
   * [x] Sound effects.
   * [x] Snorkel.
-  * [ ] Pickaxe and barrier tiles.
-  * [ ] Pump tile.
+  * [x] Pickaxe and barrier tiles.
+  * [x] Pump tile.
   * [ ] Map work.
 
 ## Brainstorming
