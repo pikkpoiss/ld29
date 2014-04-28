@@ -1,11 +1,11 @@
 package main
 
 import (
+	twodee "../libs/twodee"
 	"os"
+	"sort"
 	"strings"
 	"time"
-
-	twodee "../libs/twodee"
 )
 
 func NewRain() *twodee.AnimatingEntity {
@@ -99,6 +99,7 @@ func (l *GameLayer) LoadLevel(path string) (err error) {
 	if candidates, err = dir.Readdirnames(0); err != nil {
 		return
 	}
+	sort.Sort(sort.StringSlice(candidates))
 	for _, name := range candidates {
 		if strings.HasPrefix(name, "layer") {
 			names = append(names, name)
