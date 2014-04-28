@@ -85,6 +85,7 @@ type Player struct {
 	IsPumping         bool
 	destroyableItems  map[ItemId]bool
 	HasFinalItem      bool
+	HasFlippers       bool
 	LastUsed          *Item
 }
 
@@ -149,6 +150,7 @@ func NewPlayer(x, y float32, eventSystem *twodee.GameEventHandler) (player *Play
 		CanMove:           true,
 		IsPumping:         false,
 		HasFinalItem:      false,
+		HasFlippers:       false,
 		destroyableItems:  make(map[ItemId]bool),
 		LastUsed:          nil,
 	}
@@ -203,10 +205,15 @@ func (p *Player) AttemptMove(l *Level) {
 		return
 	}
 	var (
-		a, b, trunc twodee.Point
-		bounds      = p.Bounds()
-		pos         = p.Pos()
+		a, b, trunc  twodee.Point
+		bounds       = p.Bounds()
+		pos          = p.Pos()
+		currentSpeed = p.Speed
 	)
+	if l.Active != 0 && !p.HasFlippers && l.GetLayerWaterStatus(l.Active) == 2 {
+		currentSpeed = p.Speed * 2 / 3
+	}
+
 	switch p.DesiredMove {
 	case None:
 		p.SwapState(Walking, Standing)
@@ -214,25 +221,25 @@ func (p *Player) AttemptMove(l *Level) {
 	case North:
 		a = twodee.Pt(bounds.Min.X+Fudge, bounds.Max.Y+p.Speed)
 		b = twodee.Pt(bounds.Max.X-Fudge, bounds.Max.Y+p.Speed)
-		pos.Y += p.Speed
+		pos.Y += currentSpeed
 		trunc = l.GridAlignedY(l.Active, pos)
 		p.SetState(Walking | Up)
 	case South:
 		a = twodee.Pt(bounds.Min.X+Fudge, bounds.Min.Y-p.Speed)
 		b = twodee.Pt(bounds.Max.X-Fudge, bounds.Min.Y-p.Speed)
-		pos.Y -= p.Speed
+		pos.Y -= currentSpeed
 		trunc = l.GridAlignedY(l.Active, pos)
 		p.SetState(Walking | Down)
 	case East:
 		a = twodee.Pt(bounds.Max.X+p.Speed, bounds.Min.Y+Fudge)
 		b = twodee.Pt(bounds.Max.X+p.Speed, bounds.Max.Y-Fudge)
-		pos.X += p.Speed
+		pos.X += currentSpeed
 		trunc = l.GridAlignedX(l.Active, pos)
 		p.SetState(Walking | Right)
 	case West:
 		a = twodee.Pt(bounds.Min.X-p.Speed, bounds.Min.Y+Fudge)
 		b = twodee.Pt(bounds.Min.X-p.Speed, bounds.Max.Y-Fudge)
-		pos.X -= p.Speed
+		pos.X -= currentSpeed
 		trunc = l.GridAlignedX(l.Active, pos)
 		p.SetState(Walking | Left)
 	}
@@ -251,12 +258,10 @@ func (p *Player) AddToInventory(item *Item) {
 		p.MaxHealth += 100
 		p.Health += 100
 	case Item3:
+		p.HasFlippers = true
+	case Item4:
 		p.MaxHealth += PlayerBaseHealth
 		p.Health += PlayerBaseHealth
-	case Item4:
-		if p.Speed < PlayerFastSpeed {
-			p.Speed = PlayerFastSpeed
-		}
 	case ItemFinal:
 		if p.Speed < PlayerSuperFastSpeed {
 			p.Speed = PlayerSuperFastSpeed
