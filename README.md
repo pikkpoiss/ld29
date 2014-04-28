@@ -28,12 +28,12 @@ Theme: "Beneath the surface"
   * [x] Show picked up items.
   * [x] End state.
   * [x] Splash screen.
-  * [ ] Level tiles for dry, partial, drowned levels.
+  * [x] Level tiles for dry, partial, drowned levels.
   * [x] Sound effects.
   * [x] Snorkel.
   * [x] Pickaxe and barrier tiles.
   * [x] Pump tile.
-  * [ ] Map work.
+  * [x] Map work.
 
 ## Brainstorming
 
