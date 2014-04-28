@@ -223,6 +223,12 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		victoryEffect:    victoryEffect,
 		musicToggle:      1,
 	}
+	menuMoveEffect.SetVolume(15)
+	menuSelectEffect.SetVolume(15)
+	fallDownEffect.SetVolume(15)
+	climbUpEffect.SetVolume(15)
+	pickupItemEffect.SetVolume(15)
+	rockBreakEffect.SetVolume(15)
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayOutdoorMusic, audioSystem.PlayOutdoorMusic)
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayExploreMusic, audioSystem.PlayExploreMusic)
 	audioSystem.exploreMusicObserverId = app.GameEventHandler.AddObserver(PlayWarningMusic, audioSystem.PlayWarningMusic)
