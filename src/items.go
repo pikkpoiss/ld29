@@ -12,14 +12,13 @@ const (
 	_               = iota
 	ItemDown ItemId = iota
 	ItemUp
-	Item1
+	ItemPickaxe
 	Item2
 	Item3
 	Item4
 	ItemFinal
-	ItemPump    ItemId = 44
-	ItemPickaxe ItemId = iota
-	ItemRock
+	ItemRock ItemId = 15
+	ItemPump ItemId = 44
 	item_sentinel
 )
 
@@ -34,13 +33,12 @@ const (
 var ItemIdToType = map[ItemId]ItemType{
 	ItemDown:    LayerThresholdItem,
 	ItemUp:      LayerThresholdItem,
-	Item1:       InventoryItem,
+	ItemPickaxe: InventoryItem,
 	Item2:       InventoryItem,
 	Item3:       InventoryItem,
 	Item4:       InventoryItem,
 	ItemFinal:   InventoryItem,
 	ItemPump:    UseableItem,
-	ItemPickaxe: InventoryItem,
 	ItemRock:    DestructableItem,
 }
 

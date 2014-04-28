@@ -247,9 +247,6 @@ func (p *Player) AddToInventory(item *Item) {
 	p.EventSystem.Enqueue(twodee.NewBasicGameEvent(PlayPickupItemEffect))
 	p.Inventory = append(p.Inventory, item)
 	switch item.Id {
-	case Item1:
-		p.MaxHealth += 100
-		p.Health += 100
 	case Item2:
 		p.MaxHealth += 100
 		p.Health += 100
