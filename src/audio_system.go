@@ -13,6 +13,7 @@ type AudioSystem struct {
 	fallDownEffect           *twodee.SoundEffect
 	climbUpEffect            *twodee.SoundEffect
 	pickupItemEffect         *twodee.SoundEffect
+	rockBreakEffect          *twodee.SoundEffect
 	gameOverEffect           *twodee.SoundEffect
 	victoryEffect            *twodee.SoundEffect
 	outdoorMusicObserverId   int
@@ -29,6 +30,7 @@ type AudioSystem struct {
 	fallDownObserverId       int
 	climbUpObserverId        int
 	pickupItemObserverId     int
+	rockBreakObserverId      int
 	gameOverObserverId       int
 	victoryObserverId        int
 	musicToggle              int32
@@ -112,6 +114,10 @@ func (a *AudioSystem) PlayPickupItemEffect(e twodee.GETyper) {
 	a.pickupItemEffect.PlayChannel(6, 1)
 }
 
+func (a *AudioSystem) PlayRockBreakEffect(e twodee.GETyper) {
+	a.rockBreakEffect.PlayChannel(6, 1)
+}
+
 func (a *AudioSystem) PlayGameOverEffect(e twodee.GETyper) {
 	a.gameOverEffect.PlayChannel(7, 1)
 }
@@ -133,7 +139,9 @@ func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(PlayFallDownEffect, a.fallDownObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayClimbUpEffect, a.climbUpObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayPickupItemEffect, a.pickupItemObserverId)
+	a.app.GameEventHandler.RemoveObserver(PlayerDestroyedItem, a.rockBreakObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayGameOverEffect, a.gameOverObserverId)
+	a.app.GameEventHandler.RemoveObserver(PlayVictoryEffect, a.victoryObserverId)
 	a.outdoorMusic.Delete()
 	a.exploreMusic.Delete()
 	a.warningMusic.Delete()
@@ -143,6 +151,7 @@ func (a *AudioSystem) Delete() {
 	a.fallDownEffect.Delete()
 	a.climbUpEffect.Delete()
 	a.pickupItemEffect.Delete()
+	a.rockBreakEffect.Delete()
 	a.gameOverEffect.Delete()
 	a.victoryEffect.Delete()
 }
@@ -158,6 +167,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		fallDownEffect   *twodee.SoundEffect
 		climbUpEffect    *twodee.SoundEffect
 		pickupItemEffect *twodee.SoundEffect
+		rockBreakEffect  *twodee.SoundEffect
 		gameOverEffect   *twodee.SoundEffect
 		victoryEffect    *twodee.SoundEffect
 	)
@@ -188,6 +198,9 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	if pickupItemEffect, err = twodee.NewSoundEffect("assets/soundeffects/PickupItem.ogg"); err != nil {
 		return
 	}
+	if rockBreakEffect, err = twodee.NewSoundEffect("assets/soundeffects/RockBreak.ogg"); err != nil {
+		return
+	}
 	if gameOverEffect, err = twodee.NewSoundEffect("assets/soundeffects/GameOver.ogg"); err != nil {
 		return
 	}
@@ -205,6 +218,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		fallDownEffect:   fallDownEffect,
 		climbUpEffect:    climbUpEffect,
 		pickupItemEffect: pickupItemEffect,
+		rockBreakEffect:  rockBreakEffect,
 		gameOverEffect:   gameOverEffect,
 		victoryEffect:    victoryEffect,
 		musicToggle:      1,
@@ -221,6 +235,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	audioSystem.fallDownObserverId = app.GameEventHandler.AddObserver(PlayFallDownEffect, audioSystem.PlayFallDownEffect)
 	audioSystem.climbUpObserverId = app.GameEventHandler.AddObserver(PlayClimbUpEffect, audioSystem.PlayClimbUpEffect)
 	audioSystem.pickupItemObserverId = app.GameEventHandler.AddObserver(PlayPickupItemEffect, audioSystem.PlayPickupItemEffect)
+	audioSystem.rockBreakObserverId = app.GameEventHandler.AddObserver(PlayerDestroyedItem, audioSystem.PlayRockBreakEffect)
 	audioSystem.gameOverObserverId = app.GameEventHandler.AddObserver(PlayGameOverEffect, audioSystem.PlayGameOverEffect)
 	audioSystem.victoryObserverId = app.GameEventHandler.AddObserver(PlayVictoryEffect, audioSystem.PlayVictoryEffect)
 	return
