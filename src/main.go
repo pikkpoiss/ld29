@@ -130,17 +130,23 @@ func main() {
 	defer app.Delete()
 
 	var (
+		last_render = time.Now()
 		current_time = time.Now()
 		updated_to   = current_time
 		step         = twodee.Step60Hz
+		render_max  = step
 	)
 	for !app.Context.Window.ShouldClose() && !app.InitiateCloseGame {
 		for !updated_to.After(current_time) {
 			app.Update(step)
 			updated_to = updated_to.Add(step)
 		}
+		if diff := current_time.Sub(last_render); diff < render_max {
+			time.Sleep(diff)
+		}
 		app.Draw()
 		app.Context.Window.SwapBuffers()
+		last_render = current_time
 		app.Context.Events.Poll()
 		app.GameEventHandler.Poll()
 		app.ProcessEvents()
