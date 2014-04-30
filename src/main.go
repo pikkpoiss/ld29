@@ -142,7 +142,7 @@ func main() {
 			updated_to = updated_to.Add(step)
 		}
 		if diff := current_time.Sub(last_render); diff < render_max {
-			time.Sleep(diff)
+			time.Sleep(render_max - diff)
 		}
 		app.Draw()
 		app.Context.Window.SwapBuffers()
